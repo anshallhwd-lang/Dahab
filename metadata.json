@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Dahab",
+  "description": "A high-performance online bodybuilding and fitness coaching platform replica for IFBB Pro Mahmood Al Durrah.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
