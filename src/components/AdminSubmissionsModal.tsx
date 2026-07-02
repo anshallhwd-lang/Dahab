@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Lock, Eye, Trash2, Calendar, ShieldCheck, Dumbbell, User, Mail, Sparkles, Scale, MoveUp, HelpCircle } from "lucide-react";
+import { X, Lock, Eye, Trash2, Calendar, ShieldCheck, Dumbbell, User, Mail, Sparkles, Scale, MoveUp, HelpCircle, Download, Upload } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -55,6 +55,52 @@ export default function AdminSubmissionsModal({ isOpen, onClose, isRtl }: AdminS
       console.error("Error fetching submissions:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExport = () => {
+    try {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(submissions, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `dahab_fit_submissions_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (err) {
+      console.error("Export failed", err);
+    }
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    if (e.target.files && e.target.files[0]) {
+      fileReader.readAsText(e.target.files[0], "UTF-8");
+      fileReader.onload = async (event) => {
+        try {
+          const parsed = JSON.parse(event.target?.result as string);
+          if (Array.isArray(parsed)) {
+            const res = await fetch("/api/submissions/bulk-import", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(parsed),
+            });
+            if (res.ok) {
+              const result = await res.json();
+              setSubmissions(result.submissions);
+              alert(isRtl ? "تم استيراد النسخة الاحتياطية وتحديث لوحة التحكم بنجاح!" : "Backup imported and synced successfully!");
+            } else {
+              setSubmissions(parsed);
+              alert(isRtl ? "تم تحميل البيانات محلياً في المتصفح فقط." : "Loaded backup locally in browser memory.");
+            }
+          } else {
+            alert(isRtl ? "ملف النسخة الاحتياطية غير صالح!" : "Invalid backup file format!");
+          }
+        } catch (err) {
+          console.error("Import failed", err);
+          alert(isRtl ? "فشل قراءة الملف!" : "Failed to read file!");
+        }
+      };
     }
   };
 
@@ -160,10 +206,40 @@ export default function AdminSubmissionsModal({ isOpen, onClose, isRtl }: AdminS
                 </span>
                 <button 
                   onClick={fetchSubmissions}
-                  className="text-[10px] text-zinc-400 hover:text-white font-bold bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded"
+                  className="text-[10px] text-zinc-400 hover:text-white font-bold bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded cursor-pointer"
                 >
                   {isRtl ? "تحديث" : "Refresh"}
                 </button>
+              </div>
+
+              {/* Offline backup & import bar */}
+              <div className="p-3 border-b border-zinc-800 bg-zinc-950 flex gap-2 items-center justify-between text-xs shrink-0">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase">
+                  {isRtl ? "النسخ الاحتياطي لويندوز/فرسيل:" : "Vercel / Local Backup:"}
+                </span>
+                <div className="flex gap-1.5">
+                  <button 
+                    onClick={handleExport}
+                    className="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 hover:text-[#e4562f] text-zinc-300 font-bold px-2 py-1 rounded text-[10px] border border-zinc-850 transition-all cursor-pointer"
+                    title={isRtl ? "تصدير نسخة احتياطية كاملة" : "Export full backup"}
+                  >
+                    <Download className="w-3 h-3 text-[#e4562f]" />
+                    <span>{isRtl ? "تصدير" : "Export"}</span>
+                  </button>
+                  <label 
+                    className="flex items-center gap-1 bg-zinc-900 hover:bg-zinc-800 hover:text-emerald-400 text-zinc-300 font-bold px-2 py-1 rounded text-[10px] border border-zinc-850 transition-all cursor-pointer"
+                    title={isRtl ? "استيراد نسخة احتياطية" : "Import backup file"}
+                  >
+                    <Upload className="w-3 h-3 text-emerald-400" />
+                    <span>{isRtl ? "استيراد" : "Import"}</span>
+                    <input 
+                      type="file" 
+                      accept=".json" 
+                      onChange={handleImport} 
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
               </div>
 
               {loading ? (

@@ -426,11 +426,11 @@ export default function App() {
           <img
             src="https://a.top4top.io/p_3835kvqg71.png"
             alt="Coach Dahab under a dramatic gym spotlight"
-            className="w-full h-full object-cover object-center scale-105 filter brightness-75 transition-all duration-300"
+            className="w-full h-full object-cover object-center scale-105 filter brightness-85 transition-all duration-300"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-zinc-950/40 to-transparent" />
-          <div className="absolute inset-0 bg-zinc-950/10 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/45 via-zinc-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-zinc-950/5 mix-blend-overlay" />
         </div>
 
         {/* Content Container */}

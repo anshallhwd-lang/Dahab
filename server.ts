@@ -16,14 +16,24 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const SUBMISSIONS_FILE = path.join(DATA_DIR, "submissions.json");
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
-if (!fs.existsSync(SUBMISSIONS_FILE)) {
-  fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify([], null, 2), "utf-8");
+// Cache submissions in memory to avoid crashing on read-only environments
+let submissionsCache: any[] = [];
+
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(SUBMISSIONS_FILE)) {
+    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify([], null, 2), "utf-8");
+  } else {
+    const fileData = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
+    submissionsCache = JSON.parse(fileData);
+  }
+} catch (e) {
+  console.warn("Failed to initialize local filesystem directories. Defaulting to in-memory storage.", e);
 }
 
 // Serve uploads directory as static
@@ -47,8 +57,9 @@ function saveBase64File(base64DataUrl: string, originalName: string): string | n
     fs.writeFileSync(filePath, buffer);
     return `/data/uploads/${uniqueName}`;
   } catch (error) {
-    console.error("Error saving base64 file:", error);
-    return null;
+    console.error("Error saving base64 file to local storage:", error);
+    // FALLBACK: If filesystem is read-only (like Vercel), return the raw base64 data URL so it gets saved inside the JSON successfully
+    return base64DataUrl;
   }
 }
 
@@ -114,150 +125,23 @@ app.post("/api/submit-registration", async (req, res) => {
       status: "pending",
     };
 
-    // Save to submissions.json
-    let submissions = [];
+    // Add to in-memory cache
+    submissionsCache.push(newSubmission);
+
+    // Attempt to save to submissions.json
     try {
-      const fileData = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
-      submissions = JSON.parse(fileData);
+      fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissionsCache, null, 2), "utf-8");
     } catch (e) {
-      submissions = [];
-    }
-    submissions.push(newSubmission);
-    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissions, null, 2), "utf-8");
-
-    // Attempt to send email to m3369703@gmail.com
-    const targetEmail = "m3369703@gmail.com";
-    
-    // Configure mailer
-    const smtpHost = process.env.SMTP_HOST || "";
-    const smtpPort = parseInt(process.env.SMTP_PORT || "587");
-    const smtpUser = process.env.SMTP_USER || "";
-    const smtpPass = process.env.SMTP_PASS || "";
-
-    let emailSent = false;
-    let mailError = "";
-
-    if (smtpUser && smtpPass) {
-      try {
-        const transporter = nodemailer.createTransport({
-          host: smtpHost || "smtp.gmail.com",
-          port: smtpPort,
-          secure: smtpPort === 465,
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-        });
-
-        const goalText = goal === "gain" ? "Bulk/Muscle Gain" : goal === "shred" ? "Cut/Fat Loss" : "General Health";
-        const emailBodyHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fdfdfd;">
-            <h2 style="color: #e4562f; text-align: center; border-bottom: 2px solid #e4562f; padding-bottom: 10px;">
-              New Registration: ${name}
-            </h2>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tr style="background-color: #f2f2f2;">
-                <td style="padding: 8px; font-weight: bold; width: 35%;">Selected Program:</td>
-                <td style="padding: 8px;">${programTitleEn} (${programTitleAr})</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; font-weight: bold;">Client Name:</td>
-                <td style="padding: 8px;">${name}</td>
-              </tr>
-              <tr style="background-color: #f2f2f2;">
-                <td style="padding: 8px; font-weight: bold;">Email Address:</td>
-                <td style="padding: 8px;"><a href="mailto:${email}">${email}</a></td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; font-weight: bold;">Age:</td>
-                <td style="padding: 8px;">${age} years old</td>
-              </tr>
-              <tr style="background-color: #f2f2f2;">
-                <td style="padding: 8px; font-weight: bold;">Weight:</td>
-                <td style="padding: 8px;">${weight} kg</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; font-weight: bold;">Height:</td>
-                <td style="padding: 8px;">${height} cm</td>
-              </tr>
-              <tr style="background-color: #f2f2f2;">
-                <td style="padding: 8px; font-weight: bold;">Goal:</td>
-                <td style="padding: 8px; font-weight: ${goal === "shred" ? "bold" : "normal"}; color: ${goal === "shred" ? "#e4562f" : "#333"};">${goalText}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; font-weight: bold;">Payment Method:</td>
-                <td style="padding: 8px; font-weight: bold; color: #10b981;">${paymentMethod.toUpperCase()}</td>
-              </tr>
-            </table>
-
-            <div style="margin-top: 20px; padding: 12px; background-color: #f9f9f9; border-left: 4px solid #e4562f; border-radius: 4px;">
-              <strong style="display: block; margin-bottom: 5px;">Client Notes / Injuries / Health Info:</strong>
-              <p style="margin: 0; font-style: italic; color: #555;">${notes || "None provided"}</p>
-            </div>
-
-            <h3 style="color: #333; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Attachments Info:</h3>
-            <ul style="padding-left: 20px;">
-              <li><strong>Payment Proof:</strong> ${paymentProofUrl ? "Attached successfully" : "Not uploaded / failed"}</li>
-              <li><strong>Progress Photos:</strong> ${photoUrls.length} photo(s) uploaded</li>
-            </ul>
-
-            <div style="margin-top: 30px; text-align: center; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 15px;">
-              This notification was generated automatically by the Elite Custom Program Registration System.
-            </div>
-          </div>
-        `;
-
-        const attachments: any[] = [];
-        
-        // Attach payment proof
-        if (paymentProofUrl) {
-          const absolutePath = path.join(process.cwd(), paymentProofUrl);
-          if (fs.existsSync(absolutePath)) {
-            attachments.push({
-              filename: paymentProof?.name || "payment_proof.png",
-              path: absolutePath
-            });
-          }
-        }
-
-        // Attach progress photos
-        for (const p of photoUrls) {
-          const absolutePath = path.join(process.cwd(), p.url);
-          if (fs.existsSync(absolutePath)) {
-            attachments.push({
-              filename: p.name,
-              path: absolutePath
-            });
-          }
-        }
-
-        await transporter.sendMail({
-          from: `"Elite Program Registration" <${smtpUser}>`,
-          to: targetEmail,
-          subject: `🏋️ New Registration: ${name} (${programTitleEn})`,
-          html: emailBodyHtml,
-          attachments
-        });
-
-        emailSent = true;
-      } catch (err: any) {
-        console.error("Nodemailer send failed:", err);
-        mailError = err?.message || "Unknown mailer error";
-      }
-    } else {
-      console.warn("SMTP credentials not provided in env variables. Email notification was not sent. Registration saved locally to submissions.json.");
-      mailError = "SMTP credentials missing";
+      console.warn("Failed to write submission to local file system. Kept in memory only.", e);
     }
 
+    // Return success response immediately, completely bypassing email sending as requested
     res.status(200).json({
       success: true,
       submissionId: newSubmission.id,
-      emailSent,
-      mailError: emailSent ? null : mailError,
-      message: emailSent
-        ? "Registration received and email notification sent successfully"
-        : "Registration received and saved locally (Email sending skipped/failed)",
+      emailSent: false,
+      mailError: "Email sending disabled as requested",
+      message: "Registration received and saved locally inside the application successfully.",
     });
   } catch (error: any) {
     console.error("Submission API error:", error);
@@ -268,9 +152,16 @@ app.post("/api/submit-registration", async (req, res) => {
 // API endpoint to retrieve submissions (secured/public-view for simplified dashboard)
 app.get("/api/submissions", (req, res) => {
   try {
-    const fileData = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
-    const submissions = JSON.parse(fileData);
-    res.json(submissions);
+    // Try to read from filesystem to have the most up-to-date data, fallback to memory cache
+    try {
+      if (fs.existsSync(SUBMISSIONS_FILE)) {
+        const fileData = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
+        submissionsCache = JSON.parse(fileData);
+      }
+    } catch (e) {
+      console.warn("Failed to read submissions from disk. Using memory cache.", e);
+    }
+    res.json(submissionsCache);
   } catch (error: any) {
     res.status(500).json({ error: error?.message || "Failed to load submissions" });
   }
@@ -280,29 +171,80 @@ app.get("/api/submissions", (req, res) => {
 app.delete("/api/submissions/:id", (req, res) => {
   try {
     const { id } = req.params;
-    const fileData = fs.readFileSync(SUBMISSIONS_FILE, "utf-8");
-    let submissions = JSON.parse(fileData);
     
-    // Also delete associated local files to save space
-    const target = submissions.find((s: any) => s.id === id);
+    // Also delete associated local files to save space if filesystem is writable
+    const target = submissionsCache.find((s: any) => s.id === id);
     if (target) {
       if (target.paymentProofUrl) {
-        const p = path.join(process.cwd(), target.paymentProofUrl);
-        if (fs.existsSync(p)) fs.unlinkSync(p);
+        try {
+          const p = path.join(process.cwd(), target.paymentProofUrl);
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        } catch (err) {
+          console.warn("Could not delete payment proof file from disk", err);
+        }
       }
       if (target.photos && Array.isArray(target.photos)) {
         for (const photo of target.photos) {
-          const p = path.join(process.cwd(), photo.url);
-          if (fs.existsSync(p)) fs.unlinkSync(p);
+          try {
+            const p = path.join(process.cwd(), photo.url);
+            if (fs.existsSync(p)) fs.unlinkSync(p);
+          } catch (err) {
+            console.warn("Could not delete progress photo from disk", err);
+          }
         }
       }
     }
 
-    submissions = submissions.filter((s: any) => s.id !== id);
-    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissions, null, 2), "utf-8");
+    submissionsCache = submissionsCache.filter((s: any) => s.id !== id);
+
+    try {
+      fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissionsCache, null, 2), "utf-8");
+    } catch (e) {
+      console.warn("Could not write updated submissions to disk after deletion.", e);
+    }
+
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: error?.message || "Failed to delete submission" });
+  }
+});
+
+// API endpoint to bulk-import/restore submissions
+app.post("/api/submissions/bulk-import", (req, res) => {
+  try {
+    const importedData = req.body;
+    if (!Array.isArray(importedData)) {
+      return res.status(400).json({ error: "Imported data must be an array" });
+    }
+
+    // Merge or replace depending on ID
+    const mergedMap = new Map<string, any>();
+    
+    // Add existing cache items first
+    submissionsCache.forEach((sub) => {
+      if (sub && sub.id) {
+        mergedMap.set(sub.id, sub);
+      }
+    });
+
+    // Overwrite with or append imported items
+    importedData.forEach((sub) => {
+      if (sub && sub.id) {
+        mergedMap.set(sub.id, sub);
+      }
+    });
+
+    submissionsCache = Array.from(mergedMap.values());
+
+    try {
+      fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissionsCache, null, 2), "utf-8");
+    } catch (e) {
+      console.warn("Could not write imported submissions to disk.", e);
+    }
+
+    res.json({ success: true, submissions: submissionsCache });
+  } catch (error: any) {
+    res.status(500).json({ error: error?.message || "Failed to bulk import submissions" });
   }
 });
 
