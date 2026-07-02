@@ -44,13 +44,37 @@ export default function AdminSubmissionsModal({ isOpen, onClose, isRtl }: AdminS
   const fetchSubmissions = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/submissions");
-      if (res.ok) {
-        const data = await res.json();
-        // Sort newest first
-        data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setSubmissions(data);
+      let serverSubmissions: any[] = [];
+      try {
+        const res = await fetch("/api/submissions");
+        if (res.ok) {
+          serverSubmissions = await res.json();
+        }
+      } catch (e) {
+        console.warn("Failed to fetch from server API", e);
       }
+
+      let localSubmissions: any[] = [];
+      try {
+        localSubmissions = JSON.parse(localStorage.getItem("local_submissions") || "[]");
+      } catch (e) {
+        console.warn("Failed to load local submissions", e);
+      }
+
+      // Merge by ID
+      const mergedMap = new Map<string, any>();
+      serverSubmissions.forEach((sub: any) => {
+        if (sub && sub.id) mergedMap.set(sub.id, sub);
+      });
+      localSubmissions.forEach((sub: any) => {
+        if (sub && sub.id) mergedMap.set(sub.id, sub);
+      });
+
+      const mergedList = Array.from(mergedMap.values());
+      // Sort newest first
+      mergedList.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      setSubmissions(mergedList);
     } catch (err) {
       console.error("Error fetching submissions:", err);
     } finally {
@@ -80,6 +104,13 @@ export default function AdminSubmissionsModal({ isOpen, onClose, isRtl }: AdminS
         try {
           const parsed = JSON.parse(event.target?.result as string);
           if (Array.isArray(parsed)) {
+            // Also store in localStorage to make sure it persists in Vercel/local memory
+            try {
+              localStorage.setItem("local_submissions", JSON.stringify(parsed));
+            } catch (err) {
+              console.warn("Failed to write imported to localStorage", err);
+            }
+
             const res = await fetch("/api/submissions/bulk-import", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -122,14 +153,27 @@ export default function AdminSubmissionsModal({ isOpen, onClose, isRtl }: AdminS
     }
 
     try {
-      const res = await fetch(`/api/submissions/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        setSubmissions((prev) => prev.filter((s) => s.id !== id));
-        if (selectedSubmission?.id === id) {
-          setSelectedSubmission(null);
-        }
+      // 1. Delete from local storage
+      try {
+        const localSubmissions = JSON.parse(localStorage.getItem("local_submissions") || "[]");
+        const filtered = localSubmissions.filter((s: any) => s.id !== id);
+        localStorage.setItem("local_submissions", JSON.stringify(filtered));
+      } catch (err) {
+        console.error("Failed to delete from localStorage", err);
+      }
+
+      // 2. Delete from server
+      try {
+        await fetch(`/api/submissions/${id}`, {
+          method: "DELETE",
+        });
+      } catch (err) {
+        console.warn("Failed to delete from server, deleted locally", err);
+      }
+
+      setSubmissions((prev) => prev.filter((s) => s.id !== id));
+      if (selectedSubmission?.id === id) {
+        setSelectedSubmission(null);
       }
     } catch (err) {
       console.error("Failed to delete submission:", err);
