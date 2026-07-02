@@ -25,7 +25,7 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
     // Simulate downloading a file
     const link = document.createElement("a");
     link.href = "#";
-    link.setAttribute("download", "Dahab_Fit_Elite_Recipes.pdf");
+    link.setAttribute("download", "The_Million_Dollar_Book.pdf");
     document.body.appendChild(link);
     // We don't trigger actual click so it doesn't navigate away in sandboxed iframe
     setTimeout(() => {
@@ -33,8 +33,8 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
     }, 100);
     if (showToast) {
       const msg = isRtl
-        ? "بدأ تحميل كتاب وصفات كمال الأجسام بنجاح! بالهناء والشفاء."
-        : "Your Elite Recipe Book download has started successfully! Bon appétit.";
+        ? "بدأ تحميل كتاب The Million Dollar Book بنجاح!"
+        : "Your download of The Million Dollar Book has started successfully!";
       showToast(msg, "success");
     }
   };

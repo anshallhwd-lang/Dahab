@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Upload, CheckCircle, ChevronRight, ChevronLeft } from "lucide-react";
+import { X, Upload, CheckCircle, ChevronRight, ChevronLeft, Copy } from "lucide-react";
 import { Program } from "../types";
 
 interface RegistrationModalProps {
@@ -10,6 +10,7 @@ interface RegistrationModalProps {
   dictionary: any;
   isRtl: boolean;
   showToast?: (message: string, type?: "success" | "error" | "info") => void;
+  country: "USA" | "Egypt";
 }
 
 export default function RegistrationModal({
@@ -20,6 +21,7 @@ export default function RegistrationModal({
   dictionary,
   isRtl,
   showToast,
+  country,
 }: RegistrationModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [activeProgram, setActiveProgram] = useState<Program | null>(selectedProgram);
@@ -33,7 +35,47 @@ export default function RegistrationModal({
     notes: "",
   });
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"crypto" | "paypal" | "vodafone" | "instapay">("crypto");
+  const [copied, setCopied] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getDisplayPrice = (original: string) => {
+    const numeric = parseInt(original.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(numeric)) return original;
+    if (country === "Egypt") {
+      return `${numeric * 55} E£`;
+    }
+    return `${numeric} USDT`;
+  };
+
+  const fileToBase64 = (file: File): Promise<{ name: string; data: string }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve({ name: file.name, data: reader.result as string });
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText("TXuHWgNn6xYVCjCdKebDkKk3nvC67KcVSZ");
+    setCopied(true);
+    if (showToast) {
+      showToast(isRtl ? "تم نسخ العنوان!" : "Address copied!", "success");
+    }
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyText = (text: string, successMsgAr: string, successMsgEn: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    if (showToast) {
+      showToast(isRtl ? successMsgAr : successMsgEn, "success");
+    }
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   React.useEffect(() => {
     if (selectedProgram) {
@@ -43,8 +85,11 @@ export default function RegistrationModal({
       setCurrentStep(1);
       setIsSubmitted(false);
       setUploadedFiles([]);
+      setPaymentProof(null);
+      setPaymentMethod(country === "Egypt" ? "vodafone" : "crypto");
+      setCopied(false);
     }
-  }, [selectedProgram, isOpen]);
+  }, [selectedProgram, isOpen, country]);
 
   if (!isOpen) return null;
 
@@ -72,18 +117,72 @@ export default function RegistrationModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    if (showToast) {
-      const msg = isRtl
-        ? `شكرًا لك يا ${formData.name}! تم تأكيد اشتراكك في ${
-            activeProgram ? activeProgram.titleAr : "برنامج النخبة المخصص"
-          } بنجاح.`
-        : `Thank you, ${formData.name}! Your customized order for ${
-            activeProgram ? activeProgram.titleEn : "Custom Elite Program"
-          } has been placed successfully.`;
-      showToast(msg, "success");
+    setIsSubmitting(true);
+    
+    try {
+      let base64Proof = null;
+      if (paymentProof) {
+        base64Proof = await fileToBase64(paymentProof);
+      }
+
+      const base64Files = [];
+      for (const file of uploadedFiles) {
+        const b64 = await fileToBase64(file);
+        base64Files.push(b64);
+      }
+
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        weight: formData.weight,
+        height: formData.height,
+        age: formData.age,
+        goal: formData.goal,
+        notes: formData.notes,
+        programId: activeProgram?.id || "custom-elite",
+        programTitleEn: activeProgram?.titleEn || "Custom Elite Program",
+        programTitleAr: activeProgram?.titleAr || "برنامج النخبة المخصص",
+        paymentMethod,
+        paymentProof: base64Proof,
+        uploadedFiles: base64Files,
+      };
+
+      const response = await fetch("/api/submit-registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit registration to the server.");
+      }
+
+      const result = await response.json();
+      console.log("Submission result:", result);
+
+      setIsSubmitted(true);
+      if (showToast) {
+        const msg = isRtl
+          ? `شكرًا لك يا ${formData.name}! تم تأكيد اشتراكك وإرسال بياناتك بنجاح.`
+          : `Thank you, ${formData.name}! Your subscription and details have been submitted successfully.`;
+        showToast(msg, "success");
+      }
+    } catch (err: any) {
+      console.error("Submission error:", err);
+      if (showToast) {
+        showToast(
+          isRtl
+            ? "حدث خطأ أثناء إرسال البيانات. يرجى المحاولة مرة أخرى."
+            : "An error occurred while sending your details. Please try again.",
+          "error"
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -123,12 +222,13 @@ export default function RegistrationModal({
                   {isRtl ? "اختر الخطة" : "Select Plan"}
                 </span>
               </div>
-              <div className="h-[2px] flex-1 bg-zinc-800 mx-4">
+              <div className="h-[2px] flex-1 bg-zinc-800 mx-3">
                 <div
                   className="h-full bg-[#e4562f] transition-all duration-300"
-                  style={{ width: currentStep === 1 ? "0%" : currentStep === 2 ? "50%" : "100%" }}
+                  style={{ width: currentStep > 1 ? "100%" : "0%" }}
                 />
               </div>
+
               <div className="flex items-center space-x-2 space-x-reverse">
                 <span
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
@@ -138,15 +238,16 @@ export default function RegistrationModal({
                   2
                 </span>
                 <span className="text-xs font-bold text-zinc-400 hidden sm:inline">
-                  {isRtl ? "المؤشرات الصحية" : "Stats & Goal"}
+                  {isRtl ? "الدفع" : "Payment"}
                 </span>
               </div>
-              <div className="h-[2px] flex-1 bg-zinc-800 mx-4">
+              <div className="h-[2px] flex-1 bg-zinc-800 mx-3">
                 <div
                   className="h-full bg-[#e4562f] transition-all duration-300"
-                  style={{ width: currentStep <= 2 ? "0%" : "100%" }}
+                  style={{ width: currentStep > 2 ? "100%" : "0%" }}
                 />
               </div>
+
               <div className="flex items-center space-x-2 space-x-reverse">
                 <span
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
@@ -154,6 +255,25 @@ export default function RegistrationModal({
                   }`}
                 >
                   3
+                </span>
+                <span className="text-xs font-bold text-zinc-400 hidden sm:inline">
+                  {isRtl ? "المؤشرات الصحية" : "Stats & Goal"}
+                </span>
+              </div>
+              <div className="h-[2px] flex-1 bg-zinc-800 mx-3">
+                <div
+                  className="h-full bg-[#e4562f] transition-all duration-300"
+                  style={{ width: currentStep > 3 ? "100%" : "0%" }}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <span
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    currentStep >= 4 ? "bg-[#e4562f] text-white" : "bg-zinc-800 text-zinc-400"
+                  }`}
+                >
+                  4
                 </span>
                 <span className="text-xs font-bold text-zinc-400 hidden sm:inline">
                   {isRtl ? "رفع الصور" : "Upload Photos"}
@@ -185,8 +305,13 @@ export default function RegistrationModal({
                             {isRtl ? p.subtitleAr : p.subtitleEn}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <span className="text-[#d3e754] font-bold text-xl font-mono">{p.price}</span>
+                        <div className="text-right flex flex-col items-end justify-center">
+                          {p.originalPrice && (
+                            <span className="text-xs text-zinc-500 line-through font-mono leading-none mb-1">
+                              {getDisplayPrice(p.originalPrice)}
+                            </span>
+                          )}
+                          <span className="text-[#d3e754] font-bold text-xl font-mono leading-none">{getDisplayPrice(p.price)}</span>
                         </div>
                       </div>
                     </div>
@@ -206,8 +331,332 @@ export default function RegistrationModal({
               </div>
             )}
 
-            {/* STEP 2: Stats & Goals */}
+            {/* STEP 2: Secure Payment */}
             {currentStep === 2 && (
+              <div className="space-y-6">
+                <div className="text-center bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+                  <p className="text-sm text-zinc-400">
+                    {isRtl ? "أنت تشترك الآن في:" : "You are subscribing to:"}
+                  </p>
+                  <h4 className="text-lg font-bold text-[#e4562f] mt-1 font-display">
+                    {activeProgram ? (isRtl ? activeProgram.titleAr : activeProgram.titleEn) : (isRtl ? "برنامج النخبة المخصص" : "Custom Elite Program")}
+                  </h4>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <span className="text-zinc-500 line-through font-mono text-sm">{getDisplayPrice("$500")}</span>
+                    <span className="text-emerald-400 font-extrabold font-mono text-2xl">{getDisplayPrice("$99")}</span>
+                    <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {isRtl ? "خصم خاص" : "Special Discount"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Payment Methods Selector Tabs */}
+                {country === "Egypt" ? (
+                  <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("vodafone")}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-md transition-all ${
+                        paymentMethod === "vodafone"
+                          ? "bg-[#e4562f] text-white shadow-lg shadow-[#e4562f]/20"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                      }`}
+                    >
+                      {isRtl ? "Vodafone Cash فودافون كاش" : "Vodafone Cash"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("instapay")}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-md transition-all ${
+                        paymentMethod === "instapay"
+                          ? "bg-[#e4562f] text-white shadow-lg shadow-[#e4562f]/20"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                      }`}
+                    >
+                      {isRtl ? "InstaPay انستاباي" : "InstaPay"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("crypto")}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-md transition-all ${
+                        paymentMethod === "crypto"
+                          ? "bg-[#e4562f] text-white shadow-lg shadow-[#e4562f]/20"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                      }`}
+                    >
+                      {isRtl ? "USDT (TRC20) عملة رقمية" : "USDT (TRC20) Crypto"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("paypal")}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-md transition-all ${
+                        paymentMethod === "paypal"
+                          ? "bg-[#e4562f] text-white shadow-lg shadow-[#e4562f]/20"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                      }`}
+                    >
+                      {isRtl ? "PayPal بايبال" : "PayPal Payment"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Method Content */}
+                {paymentMethod === "vodafone" && (
+                  <div className="bg-zinc-950 p-5 rounded-xl border border-zinc-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      <div className="w-16 h-16 bg-[#e60000]/10 border border-[#e60000]/30 rounded-2xl flex items-center justify-center text-white shrink-0 font-black text-2xl tracking-tighter">
+                        Voda
+                      </div>
+                      <div className="flex-1 space-y-3 text-center sm:text-right w-full">
+                        <div>
+                          <span className="text-[10px] bg-[#e60000]/20 text-[#ff4d4d] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {isRtl ? "فودافون كاش" : "Vodafone Cash"}
+                          </span>
+                          <h5 className="font-bold text-white mt-1 text-sm">
+                            {isRtl ? "تحويل فودافون كاش إلى الرقم التالي:" : "Send Vodafone Cash to this number:"}
+                          </h5>
+                        </div>
+                        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2.5">
+                          <span className="font-mono text-sm text-white select-all flex-1 text-left font-bold" dir="ltr">
+                            01007760673
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyText("01007760673", "تم نسخ الرقم 01007760673!", "Number 01007760673 copied!")}
+                            className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded transition-colors shrink-0"
+                            title="Copy Number"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-xs text-zinc-400 leading-relaxed">
+                          {isRtl
+                            ? `يرجى إرسال القيمة المحددة (${getDisplayPrice("$99")}) للرقم أعلاه، ثم رفع لقطة الشاشة للتحويل كإثبات بالأسفل.`
+                            : `Please send the exact amount (${getDisplayPrice("$99")}) to the number above, then upload the screenshot proof below.`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === "instapay" && (
+                  <div className="bg-zinc-950 p-5 rounded-xl border border-zinc-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      <div className="w-16 h-16 bg-[#6a1b9a]/10 border border-[#6a1b9a]/30 rounded-2xl flex items-center justify-center text-white shrink-0 font-bold text-lg">
+                        Insta
+                      </div>
+                      <div className="flex-1 space-y-3 text-center sm:text-right w-full">
+                        <div>
+                          <span className="text-[10px] bg-[#6a1b9a]/20 text-[#e040fb] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {isRtl ? "انستاباي" : "InstaPay"}
+                          </span>
+                          <h5 className="font-bold text-white mt-1 text-sm">
+                            {isRtl ? "الدفع من خلال انستاباي على الرقم التالي:" : "Send via InstaPay to this number:"}
+                          </h5>
+                        </div>
+                        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2.5">
+                          <span className="font-mono text-sm text-white select-all flex-1 text-left font-bold" dir="ltr">
+                            01007760673
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyText("01007760673", "تم نسخ الرقم 01007760673!", "Number 01007760673 copied!")}
+                            className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded transition-colors shrink-0"
+                            title="Copy Number"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-xs text-zinc-400 leading-relaxed">
+                          {isRtl
+                            ? `يرجى تحويل القيمة (${getDisplayPrice("$99")}) للرقم أعلاه عبر تطبيق انستاباي، ثم ارفع لقطة الشاشة للعملية كإثبات بالأسفل.`
+                            : `Please transfer the exact amount (${getDisplayPrice("$99")}) to the number above via InstaPay app, then upload the screenshot proof below.`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === "crypto" && (
+                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      {/* QR Code */}
+                      <div className="w-32 h-32 bg-white p-2 rounded-lg shrink-0 flex items-center justify-center border border-zinc-700">
+                        <img
+                          src="https://k.top4top.io/p_3835hqc201.png"
+                          alt="Crypto QR Code"
+                          className="w-full h-full object-contain"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      
+                      {/* Address info */}
+                      <div className="flex-1 space-y-3 text-center sm:text-right w-full">
+                        <div>
+                          <span className="text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded-full uppercase">
+                            USDT (TRON / TRC20)
+                          </span>
+                          <h5 className="font-bold text-white mt-1 text-sm">
+                            {isRtl ? "عنوان المحفظة الرقمية (USDT TRC20):" : "USDT TRC20 Wallet Address:"}
+                          </h5>
+                        </div>
+
+                        {/* Address row */}
+                        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2.5">
+                          <span className="font-mono text-xs text-zinc-300 break-all select-all flex-1 text-left font-bold" dir="ltr">
+                            TXuHWgNn6xYVCjCdKebDkKk3nvC67KcVSZ
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleCopyAddress}
+                            className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded transition-colors shrink-0"
+                            title="Copy Address"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-zinc-500">
+                          {isRtl
+                            ? "تأكد من اختيار شبكة TRON (TRC20) لتفادي خسارة الأموال."
+                            : "Ensure to use TRON (TRC20) network to avoid loss of funds."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === "paypal" && (
+                  <div className="bg-zinc-950 p-6 rounded-xl border border-zinc-800 text-center space-y-4">
+                    <div className="w-12 h-12 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full flex items-center justify-center mx-auto text-xl font-black">
+                      P
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-white text-sm">
+                        {isRtl ? "الدفع الآمن عبر PayPal" : "Secure PayPal Payment"}
+                      </h5>
+                      <p className="text-xs text-zinc-400 mt-2 max-w-sm mx-auto leading-relaxed">
+                        {isRtl
+                          ? `لإتمام الدفع بقيمة ${getDisplayPrice("$99")}، يرجى إرسال المبلغ عبر البايبال ثم رفع لقطة الشاشة الخاصة بالتحويل أدناه لإثبات العملية.`
+                          : `To pay ${getDisplayPrice("$99")} via PayPal, send the amount and then upload your transfer confirmation screenshot below.`}
+                      </p>
+                    </div>
+                    <a
+                      href="https://paypal.me"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#0070ba] hover:bg-[#005ea6] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
+                    >
+                      <span>{isRtl ? "فتح رابط PayPal" : "Open PayPal"}</span>
+                    </a>
+                  </div>
+                )}
+
+                {/* Proof of Payment Upload */}
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    {isRtl ? "إثبات الدفع (تحميل لقطة شاشة):" : "Payment Proof (Upload Screenshot):"} <span className="text-[#e4562f]">*</span>
+                  </label>
+                  
+                  <div
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        setPaymentProof(e.dataTransfer.files[0]);
+                      }
+                    }}
+                    className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors space-y-2 ${
+                      paymentProof ? "border-emerald-500/50 bg-emerald-500/5" : "border-zinc-800 hover:border-[#e4562f] bg-zinc-950/30"
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      id="proof"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setPaymentProof(e.target.files[0]);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label htmlFor="proof" className="cursor-pointer block space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-[#e4562f]">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                      <div className="text-xs font-bold text-zinc-300">
+                        {paymentProof 
+                          ? (isRtl ? "تغيير لقطة الشاشة" : "Change screenshot")
+                          : (isRtl ? "اسحب لقطة الشاشة هنا أو اضغط للتصفح" : "Drag screenshot here or click to browse")
+                        }
+                      </div>
+                      <p className="text-[10px] text-zinc-500 font-mono">
+                        {isRtl 
+                          ? `مطلوب إثبات تحويل بقيمة ${getDisplayPrice("$99")} بدلًا من ${getDisplayPrice("$500")}` 
+                          : `Required proof of ${getDisplayPrice("$99")} instead of ${getDisplayPrice("$500")}`}
+                      </p>
+                    </label>
+                  </div>
+
+                  {paymentProof && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs text-zinc-200 font-mono truncate max-w-[200px]">
+                          {paymentProof.name}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentProof(null)}
+                        className="text-red-500 hover:text-red-400 font-bold text-xs px-2"
+                      >
+                        {isRtl ? "حذف" : "Remove"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Step navigation buttons */}
+                <div className="pt-4 border-t border-zinc-800 flex justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(1)}
+                    className="flex items-center px-4 py-2.5 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:text-white hover:bg-zinc-800 transition-colors gap-2 text-sm"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>{isRtl ? "السابق" : "Back"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!paymentProof) {
+                        if (showToast) {
+                          showToast(
+                            isRtl 
+                              ? `يرجى تحميل لقطة شاشة لإثبات الدفع بقيمة ${getDisplayPrice("$99")} للمتابعة.` 
+                              : `Please upload a screenshot proving the ${getDisplayPrice("$99")} payment to continue.`,
+                            "error"
+                          );
+                        }
+                      } else {
+                        setCurrentStep(3);
+                      }
+                    }}
+                    className="flex items-center px-6 py-2.5 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors gap-2 text-sm"
+                  >
+                    <span>{isRtl ? "تأكيد الدفع" : "Confirm Payment"}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Stats & Goals */}
+            {currentStep === 3 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -315,7 +764,7 @@ export default function RegistrationModal({
                 <div className="pt-4 flex justify-between">
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(1)}
+                    onClick={() => setCurrentStep(2)}
                     className="flex items-center px-4 py-3 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:text-white hover:bg-zinc-800 transition-colors gap-2"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -325,7 +774,7 @@ export default function RegistrationModal({
                     type="button"
                     onClick={() => {
                       if (formData.name && formData.email && formData.weight && formData.height && formData.age) {
-                        setCurrentStep(3);
+                        setCurrentStep(4);
                       } else {
                         if (showToast) {
                           showToast(
@@ -344,8 +793,8 @@ export default function RegistrationModal({
               </div>
             )}
 
-            {/* STEP 3: Upload Photos */}
-            {currentStep === 3 && (
+            {/* STEP 4: Upload Photos */}
+            {currentStep === 4 && (
               <div className="space-y-4">
                 <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
                   {dictionary.formPhotos}
@@ -407,7 +856,7 @@ export default function RegistrationModal({
                 <div className="pt-4 flex justify-between">
                   <button
                     type="button"
-                    onClick={() => setCurrentStep(2)}
+                    onClick={() => setCurrentStep(3)}
                     className="flex items-center px-4 py-3 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:text-white hover:bg-zinc-800 transition-colors gap-2"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -415,9 +864,19 @@ export default function RegistrationModal({
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center px-6 py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] shadow-lg shadow-brand-primary/25 transition-colors gap-2"
+                    disabled={isSubmitting}
+                    className={`flex items-center px-6 py-3 text-white font-bold rounded-lg shadow-lg transition-colors gap-2 ${
+                      isSubmitting ? "bg-zinc-700 cursor-not-allowed" : "bg-[#e4562f] hover:bg-[#c94522]"
+                    }`}
                   >
-                    <span>{dictionary.formSubmit}</span>
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>{isRtl ? "جاري الإرسال..." : "Submitting..."}</span>
+                      </>
+                    ) : (
+                      <span>{dictionary.formSubmit}</span>
+                    )}
                   </button>
                 </div>
               </div>

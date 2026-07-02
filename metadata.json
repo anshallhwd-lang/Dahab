@@ -1,6 +1,6 @@
 {
-  "name": "Dahab Fit",
-  "description": "A high-performance online bodybuilding and fitness coaching platform.",
+  "name": "Dahab-Fit.1.2",
+  "description": "A high-performance online bodybuilding and fitness coaching platform replica for IFBB Pro Mahmood Al Durrah.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

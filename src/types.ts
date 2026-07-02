@@ -7,6 +7,7 @@ export interface Program {
   icon: string;
   bgImage: string;
   price: string;
+  originalPrice?: string;
   featuresEn: string[];
   featuresAr: string[];
 }

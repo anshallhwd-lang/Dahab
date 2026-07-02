@@ -5,6 +5,7 @@ interface ImageSliderProps {
   afterImg: string;
   beforeLabel?: string;
   afterLabel?: string;
+  compareLabel?: string;
 }
 
 export default function ImageSlider({
@@ -12,6 +13,7 @@ export default function ImageSlider({
   afterImg,
   beforeLabel = "BEFORE",
   afterLabel = "AFTER",
+  compareLabel = "Drag slider to compare",
 }: ImageSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -59,7 +61,7 @@ export default function ImageSlider({
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-square rounded-2xl overflow-hidden select-none border-2 border-zinc-800 bg-zinc-950 group cursor-ew-resize"
+      className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden select-none border-2 border-zinc-800 bg-zinc-950 group cursor-ew-resize"
       onMouseDown={(e) => {
         setIsDragging(true);
         handleMove(e.clientX);
@@ -123,7 +125,7 @@ export default function ImageSlider({
       {/* Overlay guide helper shown briefly/on hover */}
       <div className="absolute inset-x-0 top-4 flex justify-center opacity-80 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
         <span className="bg-zinc-950/80 backdrop-blur-xs text-[10px] text-zinc-400 font-mono px-3 py-1 rounded-full border border-zinc-800">
-          Drag slider to compare
+          {compareLabel}
         </span>
       </div>
     </div>
