@@ -25,7 +25,7 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
     // Simulate downloading a file
     const link = document.createElement("a");
     link.href = "#";
-    link.setAttribute("download", "Durrah_Elite_Recipes.pdf");
+    link.setAttribute("download", "Dahab_Fit_Elite_Recipes.pdf");
     document.body.appendChild(link);
     // We don't trigger actual click so it doesn't navigate away in sandboxed iframe
     setTimeout(() => {
@@ -41,8 +41,8 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
 
   const sampleRecipes = [
     {
-      titleEn: "Durrah's Post-Workout Beef & Jasmine Rice",
-      titleAr: "وجبة لحم البقر والرز الياسمين المفضلة لكوتش درة",
+      titleEn: "Dahab's Post-Workout Beef & Jasmine Rice",
+      titleAr: "وجبة لحم البقر وأرز الياسمين المفضلة لكوتش دهب",
       macros: "65g Protein | 80g Carbs | 12g Fat | 690 kcal",
       ingredientsEn: ["250g Lean Minced Beef (95%)", "1 cup cooked Jasmine Rice", "50g fresh Spinach", "1 tbsp Low-Sodium Soy Sauce"],
       ingredientsAr: ["٢٥٠ جرام لحم بقري مفروم قليل الدسم (٩٥٪)", "كوب أرز ياسمين مطبوخ", "٥٠ جرام سبانخ طازجة", "ملعقة كبيرة صويا صوص قليلة الصوديوم"]
@@ -64,7 +64,7 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
       >
         <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950">
           <h3 className="text-xl font-bold font-display text-white tracking-tight flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#00B2FE]" />
+            <BookOpen className="w-5 h-5 text-[#e4562f]" />
             {dictionary.recipeBook}
           </h3>
           <button
@@ -92,7 +92,7 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
                   <h5 className="font-bold text-white text-sm">
                     {isRtl ? recipe.titleAr : recipe.titleEn}
                   </h5>
-                  <span className="text-[10px] bg-[#00B2FE]/10 border border-[#00B2FE]/20 text-[#00B2FE] px-2 py-0.5 rounded-full font-mono font-bold shrink-0 self-start sm:self-center">
+                  <span className="text-[10px] bg-[#e4562f]/10 border border-[#e4562f]/20 text-[#e4562f] px-2 py-0.5 rounded-full font-mono font-bold shrink-0 self-start sm:self-center">
                     {recipe.macros}
                   </span>
                 </div>
@@ -108,7 +108,7 @@ export default function RecipeBookModal({ isOpen, onClose, dictionary, isRtl, sh
           {!isDownloaded ? (
             <button
               onClick={handleDownload}
-              className="w-full py-3.5 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors flex items-center justify-center gap-2"
             >
               <Download className="w-4 h-4" />
               <span>{dictionary.recipeBookDownload}</span>

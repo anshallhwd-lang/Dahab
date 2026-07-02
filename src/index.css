@@ -5,15 +5,33 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-brand-primary: #e4562f;
+  --color-brand-accent: #d3e754;
 }
 
 /* Custom background styles & utilities */
 .grid-bg-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(228, 86, 47, 0.08) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .glow-btn:hover {
-  box-shadow: 0 0 15px rgba(0, 178, 254, 0.4);
+  box-shadow: 0 0 20px rgba(228, 86, 47, 0.5), 0 0 5px rgba(211, 231, 84, 0.2);
 }
+
+/* Beautiful custom scrollbar for that crafted feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e4562f;
+}
+
 

@@ -22,6 +22,8 @@ import {
   Award,
   ArrowUp,
   ExternalLink,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { Program } from "./types";
@@ -53,6 +55,22 @@ const imageMap: Record<string, string> = {
 
 export default function App() {
   const [lang, setLang] = useState<"en" | "ar">("en");
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") return saved;
+    }
+    return "dark";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>("faq-1");
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -80,6 +98,9 @@ export default function App() {
 
   const dict = DICTIONARY[lang];
   const isRtl = lang === "ar";
+  const navLinkClass = `px-3 py-2 text-xs font-bold transition-colors ${
+    theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+  }`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -129,91 +150,74 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased selection:bg-[#00B2FE] selection:text-black"
+      className={`min-h-screen font-sans antialiased selection:bg-[#e4562f] selection:text-white transition-colors duration-300 ${
+        theme === "dark" ? "bg-[#0b0909] text-zinc-100" : "bg-[#fdfbf7] text-zinc-900"
+      }`}
       style={{ direction: isRtl ? "rtl" : "ltr" }}
     >
       {/* HEADER / NAVIGATION BAR */}
       <header
         id="navbar-header"
-        className="sticky top-0 z-40 w-full bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900"
+        className={`sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300 ${
+          theme === "dark" ? "bg-zinc-950/90 border-zinc-900" : "bg-white/90 border-zinc-200"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo Brand */}
           <div
             id="brand-logo"
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center cursor-pointer"
             onClick={() => scrollToSection("hero-section")}
           >
-            {/* Vector D / Double D Hexagon Logo */}
-            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-              <svg className="w-10 h-10 text-[#00B2FE]" viewBox="0 0 100 100" fill="none">
-                <polygon
-                  points="50,5 93,30 93,80 50,98 7,80 7,30"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  fill="none"
-                />
-                <path
-                  d="M35 30 H65 C75 30, 75 70, 65 70 H35"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <line x1="35" y1="30" x2="35" y2="70" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className="flex flex-col text-left select-none">
-              <span className="font-display font-extrabold tracking-tight text-white text-lg leading-none">
-                DURABOLIC
-              </span>
-              <span className="font-mono text-[9px] tracking-[0.45em] text-[#00B2FE] font-bold leading-none mt-0.5">
-                NUTRITION
-              </span>
-            </div>
+            <img
+              src={theme === "dark" ? "https://j.top4top.io/p_38351xej82.png" : "https://k.top4top.io/p_3835p9t733.png"}
+              alt="Durabolic Logo"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain transition-all duration-300"
+              referrerPolicy="no-referrer"
+            />
           </div>
 
           {/* Desktop Navigation Links */}
           <nav id="desktop-nav" className="hidden lg:flex items-center gap-1 xl:gap-2">
             <button
               onClick={() => scrollToSection("hero-section")}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.home}
             </button>
             <button
               onClick={() => setIsWhoDurrahOpen(true)}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.whoIsDurrah}
             </button>
             <button
               onClick={() => scrollToSection("transformations-section")}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.transformations}
             </button>
             <button
               onClick={() => scrollToSection("services-section")}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.services}
             </button>
             <button
               onClick={() => setIsConsultationOpen(true)}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.videoConsultation}
             </button>
             <button
               onClick={() => setIsRecipeOpen(true)}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors text-emerald-400"
+              className="px-3 py-2 text-xs font-bold hover:text-[#e4562f] transition-colors text-emerald-500"
             >
               {dict.recipeBook}
             </button>
             <button
               onClick={() => setIsContactOpen(true)}
-              className="px-3 py-2 text-xs font-bold text-zinc-400 hover:text-[#00B2FE] transition-colors"
+              className={navLinkClass}
             >
               {dict.contact}
             </button>
@@ -221,44 +225,39 @@ export default function App() {
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="ml-2 px-3 py-1.5 rounded-full border border-zinc-800 text-xs font-mono font-bold text-white hover:border-[#00B2FE] hover:text-[#00B2FE] bg-zinc-900 transition-all flex items-center gap-1.5"
+              className={`ml-2 px-3 py-1.5 rounded-full border text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+                theme === "dark"
+                  ? "border-zinc-800 text-white bg-zinc-900 hover:border-[#e4562f] hover:text-[#e4562f]"
+                  : "border-zinc-200 text-zinc-800 bg-zinc-100 hover:border-[#e4562f] hover:text-[#e4562f]"
+              }`}
             >
               <span>{isRtl ? "English" : "عربي"}</span>
             </button>
           </nav>
 
-          {/* Social Icons & Contact Action (Desktop) */}
-          <div id="header-socials" className="hidden lg:flex items-center gap-3">
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
+          {/* Theme Toggle Button (Desktop) replacing social icons */}
+          <div id="header-theme-toggle" className="hidden lg:flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className={`p-2.5 rounded-full border transition-all flex items-center justify-center cursor-pointer ${
+                theme === "dark"
+                  ? "bg-zinc-900 border-zinc-800 text-amber-400 hover:border-amber-400/50 hover:bg-zinc-800"
+                  : "bg-zinc-100 border-zinc-200 text-amber-500 hover:border-amber-500/50 hover:bg-zinc-200"
+              }`}
+              aria-label="Toggle Theme"
             >
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
-            >
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              referrerPolicy="no-referrer"
-              className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
-            >
-              <Youtube className="w-4 h-4" />
-            </a>
+              {theme === "dark" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+            </button>
           </div>
 
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
+            className={`lg:hidden p-2 rounded-lg transition-colors ${
+              theme === "dark"
+                ? "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+            }`}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -266,10 +265,17 @@ export default function App() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <nav id="mobile-nav" className="lg:hidden border-t border-zinc-900 bg-zinc-950/98 p-5 space-y-3">
+          <nav
+            id="mobile-nav"
+            className={`lg:hidden border-t p-5 space-y-3 transition-colors duration-300 ${
+              theme === "dark" ? "border-zinc-900 bg-zinc-950/98" : "border-zinc-200 bg-white/98"
+            }`}
+          >
             <button
               onClick={() => scrollToSection("hero-section")}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.home}
             </button>
@@ -278,19 +284,25 @@ export default function App() {
                 setMobileMenuOpen(false);
                 setIsWhoDurrahOpen(true);
               }}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.whoIsDurrah}
             </button>
             <button
               onClick={() => scrollToSection("transformations-section")}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.transformations}
             </button>
             <button
               onClick={() => scrollToSection("services-section")}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.services}
             </button>
@@ -299,7 +311,9 @@ export default function App() {
                 setMobileMenuOpen(false);
                 setIsConsultationOpen(true);
               }}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.videoConsultation}
             </button>
@@ -308,7 +322,9 @@ export default function App() {
                 setMobileMenuOpen(false);
                 setIsRecipeOpen(true);
               }}
-              className="block w-full text-left font-bold text-sm text-emerald-400 py-2"
+              className={`block w-full font-bold text-sm py-2 text-emerald-500 transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              }`}
             >
               {dict.recipeBook}
             </button>
@@ -317,30 +333,41 @@ export default function App() {
                 setMobileMenuOpen(false);
                 setIsContactOpen(true);
               }}
-              className="block w-full text-left font-bold text-sm text-zinc-300 py-2 hover:text-[#00B2FE]"
+              className={`block w-full font-bold text-sm py-2 hover:text-[#e4562f] transition-colors ${
+                isRtl ? "text-right" : "text-left"
+              } ${theme === "dark" ? "text-zinc-300" : "text-zinc-700"}`}
             >
               {dict.contact}
             </button>
 
-            {/* Mobile Lang and Socials */}
-            <div className="pt-4 border-t border-zinc-900 flex items-center justify-between">
+            {/* Mobile Lang and Theme Switcher */}
+            <div
+              className={`pt-4 border-t flex items-center justify-between transition-colors duration-300 ${
+                theme === "dark" ? "border-zinc-900" : "border-zinc-200"
+              }`}
+            >
               <button
                 onClick={toggleLanguage}
-                className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-[#00B2FE]"
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                  theme === "dark"
+                    ? "bg-zinc-900 border border-zinc-800 text-[#e4562f]"
+                    : "bg-zinc-100 border border-zinc-200 text-[#e4562f]"
+                }`}
               >
                 {isRtl ? "English" : "عربي"}
               </button>
-              <div className="flex gap-3">
-                <a href="#" className="text-zinc-400 hover:text-white">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-zinc-400 hover:text-white">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-zinc-400 hover:text-white">
-                  <Youtube className="w-5 h-5" />
-                </a>
-              </div>
+
+              <button
+                onClick={toggleTheme}
+                className={`p-2 rounded-lg border transition-all flex items-center justify-center cursor-pointer ${
+                  theme === "dark"
+                    ? "bg-zinc-900 border-zinc-800 text-amber-400 hover:bg-zinc-800"
+                    : "bg-zinc-100 border-zinc-200 text-amber-500 hover:bg-zinc-200"
+                }`}
+                aria-label="Toggle Theme"
+              >
+                {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
             </div>
           </nav>
         )}
@@ -355,7 +382,7 @@ export default function App() {
         <div className="absolute inset-0 z-0">
           <img
             src={imageMap["durrah_hero_1782919258240.jpg"]}
-            alt="Mahmood Al Durrah flexing side bicep under a dramatic gym spotlight"
+            alt="Coach Dahab under a dramatic gym spotlight"
             className="w-full h-full object-cover object-center scale-105 filter brightness-50"
             referrerPolicy="no-referrer"
           />
@@ -367,8 +394,8 @@ export default function App() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col justify-center items-center text-center">
           {/* DURRAH Display Text */}
           <div className="relative mb-6">
-            <h1 className="text-7xl sm:text-9xl md:text-[13rem] font-black tracking-widest text-[#00B2FE] leading-none uppercase font-display select-none opacity-90 filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]">
-              DURRAH
+            <h1 className="text-7xl sm:text-9xl md:text-[11rem] font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#e4562f] to-[#d3e754] leading-none uppercase font-display select-none opacity-95 filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]">
+              DAHAB FIT
             </h1>
           </div>
 
@@ -376,11 +403,11 @@ export default function App() {
           <div className="flex flex-col items-center gap-3 max-w-2xl mt-4">
             <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600/10 border border-red-500/30 shadow-lg shadow-red-950/30 animate-pulse">
               <span className="text-xs sm:text-sm font-extrabold text-red-500 tracking-wider uppercase font-display">
-                {dict.olympianSub.split(" ")[0]} {dict.olympianSub.split(" ")[1]}
+                {dict.olympianSub.split(" ").slice(0, 2).join(" ")}
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-              <span className="text-xs sm:text-sm font-extrabold text-zinc-100 tracking-wider uppercase">
-                {dict.olympianSub.substring(10)}
+              <span className="text-xs sm:text-sm font-extrabold text-zinc-100 tracking-wider uppercase font-display">
+                {dict.olympianSub.split(" ").slice(2).join(" ")}
               </span>
             </div>
 
@@ -392,7 +419,7 @@ export default function App() {
             <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
               <button
                 onClick={() => scrollToSection("services-section")}
-                className="glow-btn px-8 py-4 bg-[#00B2FE] text-black font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider"
+                className="glow-btn px-8 py-4 bg-[#e4562f] text-white font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider"
               >
                 {dict.buyNow}
               </button>
@@ -409,10 +436,10 @@ export default function App() {
         {/* Bottom decorative stats layout snippet */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-8 text-xs font-mono text-zinc-500">
           <span>IFBB PRO CARD ID: 12059-A</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00B2FE]/30" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#e4562f]/30" />
           <span>ESTABLISHED 2013</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00B2FE]/30" />
-          <span>WWW.DURRAHNATION.COM</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#e4562f]/30" />
+          <span>WWW.DAHABFIT.COM</span>
         </div>
       </section>
 
@@ -420,7 +447,7 @@ export default function App() {
       <section id="services-section" className="py-24 bg-zinc-950 relative border-b border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#00B2FE] uppercase font-display">
+            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#e4562f] uppercase font-display">
               {isRtl ? "برامج تدريب النخبة" : "ELITE COACHING PLANS"}
             </h2>
             <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
@@ -433,7 +460,7 @@ export default function App() {
               <div
                 key={program.id}
                 id={`card-${program.id}`}
-                className="group relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 flex flex-col h-[480px] transition-all duration-300 hover:border-[#00B2FE]/50 hover:shadow-2xl hover:shadow-[#00B2FE]/5"
+                className="group relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 flex flex-col h-[480px] transition-all duration-300 hover:border-[#e4562f]/50 hover:shadow-2xl hover:shadow-[#e4562f]/5"
               >
                 {/* Background image on top half */}
                 <div className="relative h-48 w-full overflow-hidden">
@@ -445,10 +472,10 @@ export default function App() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent" />
                   <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                    <div className="w-10 h-10 rounded-full bg-zinc-950/80 backdrop-blur-xs border border-zinc-800 flex items-center justify-center text-[#00B2FE]">
+                    <div className="w-10 h-10 rounded-full bg-zinc-950/80 backdrop-blur-xs border border-zinc-800 flex items-center justify-center text-[#e4562f]">
                       {renderIcon(program.icon, "w-5 h-5")}
                     </div>
-                    <span className="bg-[#00B2FE] text-black font-mono font-bold text-xs px-3 py-1 rounded-full">
+                    <span className="bg-[#d3e754] text-black font-mono font-bold text-xs px-3 py-1 rounded-full shadow-sm">
                       {program.price}
                     </span>
                   </div>
@@ -460,13 +487,13 @@ export default function App() {
                     <h3 className="text-xl font-bold text-white font-display tracking-tight">
                       {isRtl ? program.titleAr : program.titleEn}
                     </h3>
-                    <p className="text-xs text-[#00B2FE] font-bold">
+                    <p className="text-xs text-[#e4562f] font-bold">
                       {isRtl ? program.subtitleAr : program.subtitleEn}
                     </p>
                     <ul className="space-y-2 pt-3">
                       {(isRtl ? program.featuresAr : program.featuresEn).map((feat, i) => (
                         <li key={i} className="flex items-start gap-2 text-xs text-zinc-400">
-                          <Check className="w-4 h-4 text-[#00B2FE] shrink-0 mt-0.5" />
+                          <Check className="w-4 h-4 text-[#d3e754] shrink-0 mt-0.5" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -475,7 +502,7 @@ export default function App() {
 
                   <button
                     onClick={() => handleOpenProgram(program)}
-                    className="w-full py-3 mt-6 bg-[#00B2FE] text-black font-extrabold rounded-lg hover:bg-[#0092d0] transition-colors text-xs uppercase tracking-wider"
+                    className="w-full py-3 mt-6 bg-[#e4562f] text-white font-extrabold rounded-lg hover:bg-[#c94522] transition-colors text-xs uppercase tracking-wider shadow-md shadow-brand-primary/10"
                   >
                     {dict.buyNow}
                   </button>
@@ -493,7 +520,7 @@ export default function App() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#00B2FE] uppercase font-display">
+            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#e4562f] uppercase font-display">
               {dict.topTransformations}
             </h2>
             <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
@@ -531,8 +558,8 @@ export default function App() {
                     {isRtl ? t.descriptionAr : t.descriptionEn}
                   </p>
                   <div className="pt-3 border-t border-zinc-800 flex justify-between items-center text-[8px] text-zinc-600 font-mono">
-                    <span>DURABOLIC NUTRITION</span>
-                    <span>WWW.DURRAHNATION.COM</span>
+                    <span>DAHAB FIT</span>
+                    <span>WWW.DAHABFIT.COM</span>
                   </div>
                 </div>
               </div>
@@ -542,7 +569,7 @@ export default function App() {
           <div className="text-center mt-12">
             <button
               onClick={() => setIsRegModalOpen(true)}
-              className="glow-btn inline-flex items-center justify-center px-10 py-4 bg-[#00B2FE] text-black font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider gap-2"
+              className="glow-btn inline-flex items-center justify-center px-10 py-4 bg-[#e4562f] text-white font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider gap-2 shadow-lg shadow-brand-primary/20"
             >
               <span>{dict.changeLifeNow}</span>
             </button>
@@ -557,7 +584,7 @@ export default function App() {
             <h2 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-zinc-950 uppercase">
               {dict.changingLivesTV}
             </h2>
-            <div className="w-16 h-1 bg-[#00B2FE] mx-auto mt-4" />
+            <div className="w-16 h-1 bg-[#e4562f] mx-auto mt-4" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -575,7 +602,7 @@ export default function App() {
               <div className="pt-4">
                 <button
                   onClick={() => setIsRegModalOpen(true)}
-                  className="px-8 py-3.5 bg-[#00B2FE] text-black font-extrabold rounded-lg hover:bg-[#0092d0] transition-colors text-xs uppercase tracking-wider"
+                  className="px-8 py-3.5 bg-[#e4562f] text-white font-extrabold rounded-lg hover:bg-[#c94522] transition-colors text-xs uppercase tracking-wider shadow-lg shadow-brand-primary/15"
                 >
                   {dict.buyTheProgram}
                 </button>
@@ -586,13 +613,13 @@ export default function App() {
             <div className="lg:col-span-7 space-y-8">
               <div
                 id="video-player-container"
-                className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black border border-zinc-200 group cursor-pointer"
+                className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black border border-zinc-800 group cursor-pointer"
               >
                 {!isVideoPlaying ? (
                   <>
                     <img
                       src={imageMap["durrah_hero_1782919258240.jpg"]}
-                      alt="Who is Durrah video placeholder"
+                      alt="Who is Dahab video placeholder"
                       className="w-full h-full object-cover filter brightness-75 group-hover:scale-105 transition-transform duration-500"
                       referrerPolicy="no-referrer"
                     />
@@ -600,11 +627,11 @@ export default function App() {
                     <div className="absolute inset-0 flex flex-col justify-between p-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full border border-white/50 bg-black/60 flex items-center justify-center text-white font-bold text-xs shrink-0 font-display">
-                          MD
+                           DF
                         </div>
                         <div>
-                          <p className="text-white font-bold text-sm">Who is Durrah</p>
-                          <p className="text-white/70 text-xs">Mahmood Al Durrah</p>
+                          <p className="text-white font-bold text-sm">Who is Coach Dahab</p>
+                          <p className="text-white/70 text-xs">Coach Dahab</p>
                         </div>
                       </div>
 
@@ -619,8 +646,8 @@ export default function App() {
                       </div>
 
                       <div className="bg-black/70 backdrop-blur-xs rounded-lg p-2.5 flex items-center justify-between text-xs text-white">
-                        <span className="font-bold">DAD BECOMES BATMAN TO COMBAT BULLIES</span>
-                        <span className="text-[#00B2FE] flex items-center gap-1">
+                        <span className="font-bold">COACH DAHAB ELITE PHYSICAL TRANSFORMATION</span>
+                        <span className="text-[#e4562f] flex items-center gap-1">
                           {dict.watchVideo} <ExternalLink className="w-3.5 h-3.5" />
                         </span>
                       </div>
@@ -630,7 +657,7 @@ export default function App() {
                   <iframe
                     className="w-full h-full"
                     src="https://www.youtube.com/embed/PjG8M7X1_tY?autoplay=1"
-                    title="Who is Durrah TV news segment"
+                    title="Who is Dahab TV news segment"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
@@ -644,7 +671,7 @@ export default function App() {
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-8 filter grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all">
                   <span className="text-lg font-black tracking-tight text-zinc-900 font-display">CBC</span>
-                  <span className="text-lg font-black tracking-tight text-[#00B2FE] font-display">CTV News</span>
+                  <span className="text-lg font-black tracking-tight text-[#e4562f] font-display">CTV News</span>
                   <span className="text-lg font-black tracking-tight text-zinc-900 font-display">TV News</span>
                   <span className="text-lg font-black tracking-tight text-zinc-900 font-display">CityNews</span>
                   <span className="text-lg font-black tracking-tight text-red-600 font-display">OMNI</span>
@@ -659,7 +686,7 @@ export default function App() {
       <section id="how-it-works-section" className="py-24 bg-zinc-950 relative border-b border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#00B2FE] uppercase font-display">
+            <h2 className="text-xs sm:text-sm font-extrabold tracking-widest text-[#e4562f] uppercase font-display">
               {dict.howItWorks}
             </h2>
             <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
@@ -676,8 +703,8 @@ export default function App() {
               {STEPS_DATA.map((step) => (
                 <div key={step.number} className="text-center space-y-4">
                   {/* Circle Icon */}
-                  <div className="relative w-24 h-24 rounded-full bg-zinc-900 border-2 border-zinc-800 group-hover:border-[#00B2FE] flex items-center justify-center mx-auto text-zinc-400 hover:text-[#00B2FE] shadow-xl hover:scale-105 transition-all duration-300">
-                    <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[#00B2FE] text-black font-mono font-bold text-xs flex items-center justify-center">
+                  <div className="relative w-24 h-24 rounded-full bg-zinc-900 border-2 border-zinc-800 group-hover:border-[#e4562f] flex items-center justify-center mx-auto text-zinc-400 hover:text-[#e4562f] shadow-xl hover:scale-105 transition-all duration-300">
+                    <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[#e4562f] text-white font-mono font-bold text-xs flex items-center justify-center">
                       {step.number}
                     </div>
                     {renderIcon(step.icon, "w-10 h-10 text-white")}
@@ -700,7 +727,7 @@ export default function App() {
       </section>
 
       {/* FREQUENTLY ASKED QUESTIONS SECTION */}
-      <section id="faq-section" className="py-24 bg-[#00B2FE] text-white relative">
+      <section id="faq-section" className="py-24 bg-[#e4562f] text-white relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl font-black font-display tracking-tight text-white uppercase">
@@ -761,12 +788,12 @@ export default function App() {
             className="w-full h-full object-cover filter brightness-35"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-[#00B2FE]/10 mix-blend-color" />
+          <div className="absolute inset-0 bg-[#e4562f]/10 mix-blend-color" />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center space-y-6">
-          <h3 className="text-lg font-bold tracking-widest text-[#00B2FE] uppercase font-display">
+          <h3 className="text-lg font-bold tracking-widest text-[#d3e754] uppercase font-display">
             {dict.startTodaySub}
           </h3>
           <h2 className="text-5xl sm:text-7xl font-black text-white font-display uppercase tracking-tight">
@@ -784,7 +811,7 @@ export default function App() {
       </section>
 
       {/* TRANSFORMATION SWIPER SECTION (CHECK OUT HUNDREDS) */}
-      <section id="hundreds-transformations" className="py-24 bg-[#00B2FE] text-white relative">
+      <section id="hundreds-transformations" className="py-24 bg-[#e4562f] text-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-white uppercase">
@@ -836,7 +863,7 @@ export default function App() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="text-xl sm:text-2xl font-black tracking-widest text-[#00B2FE] uppercase font-display">
+            <h2 className="text-xl sm:text-2xl font-black tracking-widest text-[#e4562f] uppercase font-display">
               {dict.brandName}
             </h2>
             <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-light">
@@ -848,21 +875,21 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-b border-zinc-800/80 py-12">
             <div className="text-center space-y-2">
               <span className="text-5xl sm:text-6xl font-black text-white font-display block">2013</span>
-              <div className="w-8 h-1 bg-[#00B2FE] mx-auto my-2" />
+              <div className="w-8 h-1 bg-[#d3e754] mx-auto my-2" />
               <span className="text-xs uppercase tracking-widest text-zinc-400 font-mono font-bold block">
                 {dict.coachingSince}
               </span>
             </div>
             <div className="text-center space-y-2">
               <span className="text-5xl sm:text-6xl font-black text-white font-display block">16,000+</span>
-              <div className="w-8 h-1 bg-[#00B2FE] mx-auto my-2" />
+              <div className="w-8 h-1 bg-[#d3e754] mx-auto my-2" />
               <span className="text-xs uppercase tracking-widest text-zinc-400 font-mono font-bold block">
                 {dict.programsMade}
               </span>
             </div>
             <div className="text-center space-y-2">
               <span className="text-5xl sm:text-6xl font-black text-white font-display block">600+</span>
-              <div className="w-8 h-1 bg-[#00B2FE] mx-auto my-2" />
+              <div className="w-8 h-1 bg-[#d3e754] mx-auto my-2" />
               <span className="text-xs uppercase tracking-widest text-zinc-400 font-mono font-bold block">
                 {dict.publishedTransformations}
               </span>
@@ -872,7 +899,7 @@ export default function App() {
           <div className="text-center">
             <button
               onClick={() => setIsRegModalOpen(true)}
-              className="px-10 py-4 bg-[#00B2FE] text-black font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider"
+              className="px-10 py-4 bg-[#e4562f] text-white font-extrabold rounded-full hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-wider shadow-lg shadow-brand-primary/20"
             >
               {dict.buyNow}
             </button>
@@ -881,29 +908,35 @@ export default function App() {
       </section>
 
       {/* FOOTER */}
-      <footer id="footer-section" className="bg-black text-zinc-400 py-16 border-t border-zinc-900">
+      <footer id="footer-section" className={`py-16 border-t transition-colors duration-300 ${
+        theme === "dark" ? "bg-black text-zinc-400 border-zinc-900" : "bg-zinc-100 text-zinc-600 border-zinc-200"
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Left follow column */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="relative w-8 h-8 flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#00B2FE]" viewBox="0 0 100 100" fill="none">
-                  <polygon points="50,5 93,30 93,80 50,98 7,80 7,30" stroke="currentColor" strokeWidth="10" />
-                </svg>
-              </div>
-              <span className="font-display font-extrabold text-white text-base tracking-wider">
-                {dict.brandName}
-              </span>
+            <div className="flex items-center">
+              <img
+                src="https://i.top4top.io/p_3835jn7av1.png"
+                alt="Durabolic Logo"
+                className="h-12 w-auto object-contain transition-all duration-300"
+                referrerPolicy="no-referrer"
+              />
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-extrabold text-white text-xs uppercase tracking-wider">{dict.followDurrah}</h4>
+              <h4 className={`font-extrabold text-xs uppercase tracking-wider transition-colors duration-300 ${
+                theme === "dark" ? "text-white" : "text-zinc-800"
+              }`}>{dict.followDurrah}</h4>
               <div className="flex gap-4">
                 <a
                   href="https://facebook.com"
                   target="_blank"
                   referrerPolicy="no-referrer"
-                  className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    theme === "dark"
+                      ? "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#e4562f] hover:border-[#e4562f]/50"
+                      : "bg-white border border-zinc-200 text-zinc-600 hover:text-[#e4562f] hover:border-[#e4562f]/50 shadow-sm"
+                  }`}
                 >
                   <Facebook className="w-5 h-5" />
                 </a>
@@ -911,7 +944,11 @@ export default function App() {
                   href="https://instagram.com"
                   target="_blank"
                   referrerPolicy="no-referrer"
-                  className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    theme === "dark"
+                      ? "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#e4562f] hover:border-[#e4562f]/50"
+                      : "bg-white border border-zinc-200 text-zinc-600 hover:text-[#e4562f] hover:border-[#e4562f]/50 shadow-sm"
+                  }`}
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -919,7 +956,11 @@ export default function App() {
                   href="https://youtube.com"
                   target="_blank"
                   referrerPolicy="no-referrer"
-                  className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00B2FE] hover:border-[#00B2FE]/50 transition-colors"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    theme === "dark"
+                      ? "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#e4562f] hover:border-[#e4562f]/50"
+                      : "bg-white border border-zinc-200 text-zinc-600 hover:text-[#e4562f] hover:border-[#e4562f]/50 shadow-sm"
+                  }`}
                 >
                   <Youtube className="w-5 h-5" />
                 </a>
@@ -929,29 +970,58 @@ export default function App() {
 
           {/* Right quick links column */}
           <div className="space-y-4">
-            <h4 className="font-extrabold text-white text-xs uppercase tracking-wider">{dict.quickLinks}</h4>
+            <h4 className={`font-extrabold text-xs uppercase tracking-wider transition-colors duration-300 ${
+              theme === "dark" ? "text-white" : "text-zinc-800"
+            }`}>{dict.quickLinks}</h4>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <button onClick={() => setIsWhoDurrahOpen(true)} className="text-left py-1 text-zinc-400 hover:text-[#00B2FE] transition-colors">
+              <button
+                onClick={() => setIsWhoDurrahOpen(true)}
+                className={`text-left py-1 transition-colors ${
+                  theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+                }`}
+              >
                 &gt; {dict.whoIsDurrah}
               </button>
-              <button onClick={() => scrollToSection("services-section")} className="text-left py-1 text-zinc-400 hover:text-[#00B2FE] transition-colors">
+              <button
+                onClick={() => scrollToSection("services-section")}
+                className={`text-left py-1 transition-colors ${
+                  theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+                }`}
+              >
                 &gt; {dict.customizedPrograms}
               </button>
-              <button onClick={() => setIsContactOpen(true)} className="text-left py-1 text-zinc-400 hover:text-[#00B2FE] transition-colors">
+              <button
+                onClick={() => setIsContactOpen(true)}
+                className={`text-left py-1 transition-colors ${
+                  theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+                }`}
+              >
                 &gt; {dict.contact}
               </button>
-              <button onClick={() => scrollToSection("transformations-section")} className="text-left py-1 text-zinc-400 hover:text-[#00B2FE] transition-colors">
+              <button
+                onClick={() => scrollToSection("transformations-section")}
+                className={`text-left py-1 transition-colors ${
+                  theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+                }`}
+              >
                 &gt; {dict.transformations}
               </button>
-              <button onClick={() => setIsContactOpen(true)} className="text-left py-1 text-zinc-400 hover:text-[#00B2FE] transition-colors">
+              <button
+                onClick={() => setIsContactOpen(true)}
+                className={`text-left py-1 transition-colors ${
+                  theme === "dark" ? "text-zinc-400 hover:text-[#e4562f]" : "text-zinc-600 hover:text-[#e4562f]"
+                }`}
+              >
                 &gt; {dict.terms}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-zinc-900 text-center text-[10px] text-zinc-600 font-mono">
-          <p>© {new Date().getFullYear()} {dict.brandName}. ALL RIGHTS RESERVED. POWERED BY DURRAHNATION.</p>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t text-center text-[10px] font-mono ${
+          theme === "dark" ? "border-zinc-900 text-zinc-600" : "border-zinc-200 text-zinc-500"
+        }`}>
+          <p>© {new Date().getFullYear()} {dict.brandName}. ALL RIGHTS RESERVED. POWERED BY DAHAB FIT.</p>
         </div>
       </footer>
 
@@ -959,7 +1029,7 @@ export default function App() {
       {showScrollTop && (
         <button
           onClick={() => scrollToSection("navbar-header")}
-          className="fixed bottom-6 right-6 z-30 p-3 bg-[#00B2FE] hover:bg-[#0092d0] text-black font-bold rounded-full shadow-xl shadow-black/30 hover:scale-110 active:scale-95 transition-transform"
+          className="fixed bottom-6 right-6 z-30 p-3 bg-[#e4562f] hover:bg-[#c94522] text-white font-bold rounded-full shadow-xl shadow-black/30 hover:scale-110 active:scale-95 transition-transform"
         >
           <ArrowUp className="w-5 h-5" />
         </button>

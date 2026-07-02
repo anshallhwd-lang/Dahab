@@ -19,7 +19,7 @@ export default function WhoIsDurrahModal({ isOpen, onClose, dictionary, isRtl }:
       >
         <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950">
           <h3 className="text-xl font-bold font-display text-white tracking-tight flex items-center gap-2">
-            <User className="w-5 h-5 text-[#00B2FE]" />
+            <User className="w-5 h-5 text-[#e4562f]" />
             {dictionary.whoIsDurrah}
           </h3>
           <button
@@ -32,8 +32,8 @@ export default function WhoIsDurrahModal({ isOpen, onClose, dictionary, isRtl }:
 
         <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
           {/* Champion badging */}
-          <div className="flex items-center gap-4 bg-[#00B2FE]/5 border border-[#00B2FE]/20 rounded-xl p-4">
-            <div className="w-12 h-12 bg-[#00B2FE]/10 border border-[#00B2FE]/20 rounded-full flex items-center justify-center text-[#00B2FE] shrink-0">
+          <div className="flex items-center gap-4 bg-[#e4562f]/5 border border-[#e4562f]/20 rounded-xl p-4">
+            <div className="w-12 h-12 bg-[#e4562f]/10 border border-[#e4562f]/20 rounded-full flex items-center justify-center text-[#e4562f] shrink-0">
               <Award className="w-6 h-6" />
             </div>
             <div>
@@ -62,7 +62,7 @@ export default function WhoIsDurrahModal({ isOpen, onClose, dictionary, isRtl }:
                 <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold block">
                   {isRtl ? "تأهيل وتدريب" : "Coached"}
                 </span>
-                <span className="text-[#00B2FE] font-bold block">16,000+ Clients</span>
+                <span className="text-[#e4562f] font-bold block">16,000+ Clients</span>
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold block">

@@ -114,7 +114,7 @@ export default function RegistrationModal({
               <div className="flex items-center space-x-2 space-x-reverse">
                 <span
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    currentStep >= 1 ? "bg-[#00B2FE] text-black" : "bg-zinc-800 text-zinc-400"
+                    currentStep >= 1 ? "bg-[#e4562f] text-white" : "bg-zinc-800 text-zinc-400"
                   }`}
                 >
                   1
@@ -125,14 +125,14 @@ export default function RegistrationModal({
               </div>
               <div className="h-[2px] flex-1 bg-zinc-800 mx-4">
                 <div
-                  className="h-full bg-[#00B2FE] transition-all duration-300"
+                  className="h-full bg-[#e4562f] transition-all duration-300"
                   style={{ width: currentStep === 1 ? "0%" : currentStep === 2 ? "50%" : "100%" }}
                 />
               </div>
               <div className="flex items-center space-x-2 space-x-reverse">
                 <span
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    currentStep >= 2 ? "bg-[#00B2FE] text-black" : "bg-zinc-800 text-zinc-400"
+                    currentStep >= 2 ? "bg-[#e4562f] text-white" : "bg-zinc-800 text-zinc-400"
                   }`}
                 >
                   2
@@ -143,14 +143,14 @@ export default function RegistrationModal({
               </div>
               <div className="h-[2px] flex-1 bg-zinc-800 mx-4">
                 <div
-                  className="h-full bg-[#00B2FE] transition-all duration-300"
+                  className="h-full bg-[#e4562f] transition-all duration-300"
                   style={{ width: currentStep <= 2 ? "0%" : "100%" }}
                 />
               </div>
               <div className="flex items-center space-x-2 space-x-reverse">
                 <span
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    currentStep >= 3 ? "bg-[#00B2FE] text-black" : "bg-zinc-800 text-zinc-400"
+                    currentStep >= 3 ? "bg-[#e4562f] text-white" : "bg-zinc-800 text-zinc-400"
                   }`}
                 >
                   3
@@ -172,7 +172,7 @@ export default function RegistrationModal({
                       onClick={() => setActiveProgram(p)}
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         activeProgram?.id === p.id
-                          ? "border-[#00B2FE] bg-[#00B2FE]/5"
+                          ? "border-[#e4562f] bg-[#e4562f]/5"
                           : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
                       }`}
                     >
@@ -186,7 +186,7 @@ export default function RegistrationModal({
                           </p>
                         </div>
                         <div className="text-right">
-                          <span className="text-[#00B2FE] font-bold text-xl font-mono">{p.price}</span>
+                          <span className="text-[#d3e754] font-bold text-xl font-mono">{p.price}</span>
                         </div>
                       </div>
                     </div>
@@ -197,7 +197,7 @@ export default function RegistrationModal({
                   <button
                     type="button"
                     onClick={() => setCurrentStep(2)}
-                    className="flex items-center px-6 py-3 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors gap-2"
+                    className="flex items-center px-6 py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors gap-2"
                   >
                     <span>{isRtl ? "التالي" : "Next"}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default function RegistrationModal({
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                     />
                   </div>
                   <div>
@@ -233,7 +233,7 @@ export default function RegistrationModal({
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                     />
                   </div>
                 </div>
@@ -250,7 +250,7 @@ export default function RegistrationModal({
                       placeholder="e.g. 80"
                       value={formData.weight}
                       onChange={handleInputChange}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                     />
                   </div>
                   <div>
@@ -264,7 +264,7 @@ export default function RegistrationModal({
                       placeholder="e.g. 180"
                       value={formData.height}
                       onChange={handleInputChange}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                     />
                   </div>
                   <div>
@@ -278,7 +278,7 @@ export default function RegistrationModal({
                       placeholder="e.g. 25"
                       value={formData.age}
                       onChange={handleInputChange}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                     />
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export default function RegistrationModal({
                     name="goal"
                     value={formData.goal}
                     onChange={handleInputChange}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                   >
                     <option value="gain">{dictionary.formGoalGain}</option>
                     <option value="shred">{dictionary.formGoalShred}</option>
@@ -308,7 +308,7 @@ export default function RegistrationModal({
                     value={formData.notes}
                     onChange={handleInputChange}
                     rows={2}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
                   />
                 </div>
 
@@ -327,10 +327,15 @@ export default function RegistrationModal({
                       if (formData.name && formData.email && formData.weight && formData.height && formData.age) {
                         setCurrentStep(3);
                       } else {
-                        alert(isRtl ? "يرجى تعبئة كافة الحقول المطلوبة" : "Please fill out all required fields.");
+                        if (showToast) {
+                          showToast(
+                            isRtl ? "يرجى تعبئة كافة الحقول المطلوبة" : "Please fill out all required fields.",
+                            "error"
+                          );
+                        }
                       }
                     }}
-                    className="flex items-center px-6 py-3 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors gap-2"
+                    className="flex items-center px-6 py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors gap-2"
                   >
                     <span>{isRtl ? "التالي" : "Next"}</span>
                     <ChevronRight className="w-4 h-4" />
@@ -349,7 +354,7 @@ export default function RegistrationModal({
                 <div
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
-                  className="border-2 border-dashed border-zinc-800 hover:border-[#00B2FE] bg-zinc-950/50 rounded-xl p-8 text-center cursor-pointer transition-colors space-y-3"
+                  className="border-2 border-dashed border-zinc-800 hover:border-[#e4562f] bg-zinc-950/50 rounded-xl p-8 text-center cursor-pointer transition-colors space-y-3"
                 >
                   <input
                     type="file"
@@ -360,7 +365,7 @@ export default function RegistrationModal({
                     className="hidden"
                   />
                   <label htmlFor="photos" className="cursor-pointer block space-y-3">
-                    <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-[#00B2FE]">
+                    <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-[#e4562f]">
                       <Upload className="w-5 h-5" />
                     </div>
                     <div className="text-sm font-bold text-zinc-300">
@@ -410,7 +415,7 @@ export default function RegistrationModal({
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center px-6 py-3 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors gap-2"
+                    className="flex items-center px-6 py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] shadow-lg shadow-brand-primary/25 transition-colors gap-2"
                   >
                     <span>{dictionary.formSubmit}</span>
                   </button>

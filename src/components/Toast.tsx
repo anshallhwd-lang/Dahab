@@ -51,7 +51,7 @@ export function ToastItem({ toast, onClose, isRtl }: ToastItemProps) {
         return <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />;
       case "info":
       default:
-        return <Info className="w-5 h-5 text-[#00B2FE] shrink-0" />;
+        return <Info className="w-5 h-5 text-[#e4562f] shrink-0" />;
     }
   };
 
@@ -63,7 +63,7 @@ export function ToastItem({ toast, onClose, isRtl }: ToastItemProps) {
         return "border-red-500/30 hover:border-red-500/50";
       case "info":
       default:
-        return "border-[#00B2FE]/30 hover:border-[#00B2FE]/50";
+        return "border-[#e4562f]/30 hover:border-[#e4562f]/50";
     }
   };
 
@@ -75,7 +75,7 @@ export function ToastItem({ toast, onClose, isRtl }: ToastItemProps) {
         return "bg-red-500";
       case "info":
       default:
-        return "bg-[#00B2FE]";
+        return "bg-[#e4562f]";
     }
   };
 

@@ -77,7 +77,7 @@ export default function ImageSlider({
         referrerPolicy="no-referrer"
         draggable={false}
       />
-      <div className="absolute right-4 bottom-4 bg-zinc-950/80 backdrop-blur-xs text-[10px] tracking-wider font-bold text-[#00B2FE] px-2 py-1 rounded-sm border border-[#00B2FE]/30">
+      <div className="absolute right-4 bottom-4 bg-zinc-950/80 backdrop-blur-xs text-[10px] tracking-wider font-bold text-[#e4562f] px-2 py-1 rounded-sm border border-[#e4562f]/30">
         {afterLabel}
       </div>
 
@@ -100,12 +100,12 @@ export default function ImageSlider({
 
       {/* Slider Bar & Handle */}
       <div
-        className="absolute top-0 bottom-0 w-[2px] bg-[#00B2FE] cursor-ew-resize"
+        className="absolute top-0 bottom-0 w-[2px] bg-[#e4562f] cursor-ew-resize"
         style={{ left: `${sliderPosition}%` }}
       >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950 border-2 border-[#00B2FE] flex items-center justify-center shadow-lg shadow-black/50 hover:scale-110 active:scale-95 transition-transform duration-100">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950 border-2 border-[#e4562f] flex items-center justify-center shadow-lg shadow-black/50 hover:scale-110 active:scale-95 transition-transform duration-100">
           <svg
-            className="w-4 h-4 text-[#00B2FE]"
+            className="w-4 h-4 text-[#e4562f]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

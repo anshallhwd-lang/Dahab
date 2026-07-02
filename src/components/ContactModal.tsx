@@ -41,7 +41,7 @@ export default function ContactModal({ isOpen, onClose, dictionary, isRtl, showT
       >
         <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950">
           <h3 className="text-xl font-bold font-display text-white tracking-tight flex items-center gap-2">
-            <Mail className="w-5 h-5 text-[#00B2FE]" />
+            <Mail className="w-5 h-5 text-[#e4562f]" />
             {dictionary.contactTitle}
           </h3>
           <button
@@ -65,7 +65,7 @@ export default function ContactModal({ isOpen, onClose, dictionary, isRtl, showT
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
               />
             </div>
 
@@ -78,7 +78,7 @@ export default function ContactModal({ isOpen, onClose, dictionary, isRtl, showT
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
               />
             </div>
 
@@ -91,13 +91,13 @@ export default function ContactModal({ isOpen, onClose, dictionary, isRtl, showT
                 rows={4}
                 value={formData.message}
                 onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors"
+              className="w-full py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors"
             >
               {dictionary.sendMessage}
             </button>

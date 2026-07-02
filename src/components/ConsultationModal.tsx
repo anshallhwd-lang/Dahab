@@ -41,7 +41,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
       >
         <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950">
           <h3 className="text-xl font-bold font-display text-white tracking-tight flex items-center gap-2">
-            <Video className="w-5 h-5 text-[#00B2FE]" />
+            <Video className="w-5 h-5 text-[#e4562f]" />
             {dictionary.bookConsultation}
           </h3>
           <button
@@ -65,7 +65,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
               />
             </div>
 
@@ -78,7 +78,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f]"
               />
             </div>
 
@@ -93,7 +93,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
                   value={formData.date}
                   min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE] text-xs font-mono"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f] text-xs font-mono"
                 />
               </div>
               <div>
@@ -103,7 +103,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
                 <select
                   value={formData.timeSlot}
                   onChange={(e) => setFormData((prev) => ({ ...prev, timeSlot: e.target.value }))}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#00B2FE] text-xs font-mono"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#e4562f] text-xs font-mono"
                 >
                   <option value="10:00">10:00 AM AST</option>
                   <option value="12:00">12:00 PM AST</option>
@@ -117,7 +117,7 @@ export default function ConsultationModal({ isOpen, onClose, dictionary, isRtl, 
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#00B2FE] text-black font-bold rounded-lg hover:bg-[#0092d0] transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#e4562f] text-white font-bold rounded-lg hover:bg-[#c94522] transition-colors flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               <span>{isRtl ? "تأكيد موعد الاستشارة" : "Confirm Consultation Appointment"}</span>
