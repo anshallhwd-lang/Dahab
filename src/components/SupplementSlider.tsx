@@ -1,183 +1,279 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import cyi5YVR from "../assets/images/CYi5YVR.png";
+import cyi5WDG from "../assets/images/CYi5WDG.png";
 
 interface SupplementItem {
   id: number;
-  nameEn: string;
-  nameAr: string;
-  tagEn: string;
-  tagAr: string;
-  rating: string;
-  img: string;
-  descEn: string;
-  descAr: string;
+  imgAr: string;
+  imgEn: string;
 }
 
 const SUPPLEMENTS: SupplementItem[] = [
   {
     id: 1,
-    nameEn: "Whey Isolate Pro",
-    nameAr: "واي بروتين معزول برو",
-    tagEn: "MUSCLE BUILD",
-    tagAr: "بناء العضلات",
-    rating: "4.9",
-    img: "https://images.unsplash.com/photo-1579758629938-03607ccdbaba?auto=format&fit=crop&q=80&w=400",
-    descEn: "Pure fast-absorbing protein for optimal post-workout muscle recovery.",
-    descAr: "بروتين نقي سريع الامتصاص لضمان أفضل استشفاء عضلي بعد التمرين."
+    imgAr: "https://g.top4top.io/p_3836fj50n1.png",
+    imgEn: "https://h.top4top.io/p_38361r17z2.png"
   },
   {
     id: 2,
-    nameEn: "Pre-Workout Nitro",
-    nameAr: "مكمل الطاقة نيترو",
-    tagEn: "EXPLOSIVE ENERGY",
-    tagAr: "طاقة متفجرة",
-    rating: "4.8",
-    img: "https://images.unsplash.com/photo-1611536326696-b52be8ea45f6?auto=format&fit=crop&q=80&w=400",
-    descEn: "Formulated for intense energy, skin-splitting pumps, and laser focus.",
-    descAr: "تركيبة مصممة لمنحك طاقة هائلة، ضخ دم ممتاز، وتركيزًا حادًا."
+    imgAr: "https://i.top4top.io/p_38362uc8h3.png",
+    imgEn: "https://j.top4top.io/p_383652bfr4.png"
   },
   {
     id: 3,
-    nameEn: "Creatine Micronized",
-    nameAr: "كرياتين مايكرونايزد",
-    tagEn: "STRENGTH & POWER",
-    tagAr: "القوة والباور",
-    rating: "5.0",
-    img: "https://images.unsplash.com/photo-1518481612222-68bbe828ecd1?auto=format&fit=crop&q=80&w=400",
-    descEn: "100% pure micronized creatine to increase strength and performance.",
-    descAr: "كرياتين نقي ١٠٠٪ لزيادة مستويات القوة البدنية والتحمل في النادي."
+    imgAr: "https://k.top4top.io/p_3836xwyvc5.png",
+    imgEn: "https://l.top4top.io/p_3836hy0lf6.png"
   },
   {
     id: 4,
-    nameEn: "BCAA Amino Recovery",
-    nameAr: "أمينو بي سي آيه آيه",
-    tagEn: "INTRA-WORKOUT",
-    tagAr: "أثناء التمرين",
-    rating: "4.7",
-    img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=400",
-    descEn: "Essential amino acids to support active recovery and prevent muscle breakdown.",
-    descAr: "الأحماض الأمينية الأساسية لدعم الاستشفاء السريع ومنع الهدم العضلي."
+    imgAr: "https://a.top4top.io/p_3836pnckz7.png",
+    imgEn: "https://b.top4top.io/p_3836x7zze8.png"
   },
   {
     id: 5,
-    nameEn: "Multi-Vitamin Elite",
-    nameAr: "مالتي فيتامين إيليت",
-    tagEn: "DAILY VITAMINS",
-    tagAr: "فيتامينات يومية",
-    rating: "4.9",
-    img: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&q=80&w=400",
-    descEn: "Comprehensive spectrum of daily essential vitamins, minerals, and defense boosters.",
-    descAr: "مجموعة شاملة ومتكاملة من الفيتامينات والمعادن اليومية لتقوية المناعة."
+    imgAr: "https://c.top4top.io/p_3836cg35h9.png",
+    imgEn: "https://d.top4top.io/p_3836ycl7410.png"
   },
   {
     id: 6,
-    nameEn: "Omega-3 Ultra Fish Oil",
-    nameAr: "أوميجا ٣ زيت السمك",
-    tagEn: "JOINT & HEART",
-    tagAr: "المفاصل والقلب",
-    rating: "4.8",
-    img: "https://images.unsplash.com/photo-1622484211148-716598e04041?auto=format&fit=crop&q=80&w=400",
-    descEn: "Premium high-potency EPA/DHA softgels for cardiovascular health and joint mobility.",
-    descAr: "كبسولات أوميجا ٣ غنية بالأحماض الدهنية لدعم صحة المفاصل والقلب."
+    imgAr: "https://c.top4top.io/p_3836rms0u1.png",
+    imgEn: "https://d.top4top.io/p_3836homef2.png"
   },
   {
     id: 7,
-    nameEn: "Micellar Casein Night",
-    nameAr: "ميسيلار كازين الليلي",
-    tagEn: "SLOW RECOVERY",
-    tagAr: "استشفاء بطيء",
-    rating: "4.7",
-    img: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&q=80&w=400",
-    descEn: "Sustained-release protein perfect for bedtime or fasting periods to feed muscles.",
-    descAr: "بروتين بطيء الامتصاص مثالي قبل النوم أو فترات الصيام لتغذية العضلات."
+    imgAr: "https://e.top4top.io/p_38369a6yv3.png",
+    imgEn: "https://f.top4top.io/p_3836tckar4.png"
   },
   {
     id: 8,
-    nameEn: "Glutamine Pure",
-    nameAr: "جلوتامين نقي وبودر",
-    tagEn: "GUT & IMMUNE",
-    tagAr: "المناعة والهضم",
-    rating: "4.6",
-    img: "https://images.unsplash.com/photo-1550572017-edd951b55104?auto=format&fit=crop&q=80&w=400",
-    descEn: "Supports gut lining health, metabolic immune defenses, and muscle recovery.",
-    descAr: "يساعد على صحة الجهاز الهضمي، تقوية المناعة، وإصلاح الأنسجة العضلية."
+    imgAr: "https://g.top4top.io/p_383691oob5.png",
+    imgEn: "https://h.top4top.io/p_38367qc166.png"
   },
   {
     id: 9,
-    nameEn: "L-Carnitine Liquid",
-    nameAr: "إل-كارنتين سائل",
-    tagEn: "FAT METABOLIZER",
-    tagAr: "حرق الدهون",
-    rating: "4.8",
-    img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=400",
-    descEn: "Converts dietary fat into active energy for enhanced athletic output.",
-    descAr: "يساعد في نقل الأحماض الدهنية وتحويلها إلى طاقة حركية ونشاط بدني."
+    imgAr: "https://i.top4top.io/p_3836jgrwc7.png",
+    imgEn: "https://j.top4top.io/p_38364r73h8.png"
   },
   {
     id: 10,
-    nameEn: "ZMA Recovery Formula",
-    nameAr: "زد إم آيه للاستشفاء",
-    tagEn: "DEEP SLEEP",
-    tagAr: "النوم العميق",
-    rating: "4.9",
-    img: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=400",
-    descEn: "Zinc, Magnesium, and B6 blend to maximize natural hormone release during sleep.",
-    descAr: "الزنك والمغنيسيوم وفيتامين ب٦ لتحسين جودة النوم العميق وزيادة الهرمونات."
+    imgAr: "https://k.top4top.io/p_3836fmsuo9.png",
+    imgEn: "https://l.top4top.io/p_3836ppnm210.png"
   },
   {
     id: 11,
-    nameEn: "Superfood Organic Greens",
-    nameAr: "سوبرفود الخضار العضوي",
-    tagEn: "ORGANIC ALKALINE",
-    tagAr: "الصحة العضوية",
-    rating: "4.7",
-    img: "https://images.unsplash.com/photo-1546483875-5f01450a83d4?auto=format&fit=crop&q=80&w=400",
-    descEn: "Concentrated blend of essential raw organic greens and antioxidants.",
-    descAr: "مزيج رائع من الخضار العضوي المركز لتغذية الجسم ومحاربة الأكسدة."
+    imgAr: "https://b.top4top.io/p_3836cuxgy1.png",
+    imgEn: "https://c.top4top.io/p_3836w3jth2.png"
   },
   {
     id: 12,
-    nameEn: "Beta-Alanine Strength",
-    nameAr: "بيتا-ألانين للأداء",
-    tagEn: "ENDURANCE",
-    tagAr: "قوة التحمل",
-    rating: "4.8",
-    img: "https://images.unsplash.com/photo-1616671285410-534720934e8d?auto=format&fit=crop&q=80&w=400",
-    descEn: "Increases intracellular muscle carnosine to buffer lactic fatigue.",
-    descAr: "يؤخر حمض اللاكتيك في العضلات لتستطيع التمرن بكفاءة لوقت أطول."
+    imgAr: "https://d.top4top.io/p_3836tgsj93.png",
+    imgEn: "https://e.top4top.io/p_3836ry3m84.png"
   },
   {
     id: 13,
-    nameEn: "Isotonic Minerals",
-    nameAr: "إلكترولايتس ترطيب",
-    tagEn: "HYDRATION PRO",
-    tagAr: "الترطيب والنشاط",
-    rating: "4.9",
-    img: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&q=80&w=400",
-    descEn: "Restores vital mineral levels, avoiding muscle cramps and fatigue.",
-    descAr: "يعوض المعادن الأساسية التي يفقدها الجسم في العرق لمنع التشنج."
+    imgAr: "https://f.top4top.io/p_3836jbeld5.png",
+    imgEn: "https://g.top4top.io/p_3836flv9j6.png"
   },
   {
     id: 14,
-    nameEn: "Collagen Skin & Joint",
-    nameAr: "كولاجين المفاصل والجلد",
-    tagEn: "JOINT HEALTH",
-    tagAr: "صحة المفاصل",
-    rating: "4.8",
-    img: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=400",
-    descEn: "Strengthens connectivity tissues, tendons, bone density, and skin.",
-    descAr: "يقوي الأوتار والأنسجة الضامة لزيادة صلابة المفاصل وحماية الجلد."
+    imgAr: "https://h.top4top.io/p_3836d5jna7.png",
+    imgEn: "https://i.top4top.io/p_3836u3o1j8.png"
   },
   {
     id: 15,
-    nameEn: "Mass Gainer Pro",
-    nameAr: "ماس جينر برو للضخامة",
-    tagEn: "MASS BULK",
-    tagAr: "ضخامة عضلية",
-    rating: "4.7",
-    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400",
-    descEn: "Calorie-dense high-quality formula for rapid size and power increase.",
-    descAr: "مغذي عالي السعرات مصمم خصيصاً للتضخيم السريع وزيادة الوزن."
+    imgAr: "https://j.top4top.io/p_383684ms29.png",
+    imgEn: "https://k.top4top.io/p_3836lzv8910.png"
+  },
+  {
+    id: 16,
+    imgAr: cyi5YVR,
+    imgEn: cyi5WDG
+  },
+  {
+    id: 17,
+    imgAr: "https://h.top4top.io/p_3836o4zbo1.png",
+    imgEn: "https://i.top4top.io/p_3836rfl7v2.png"
+  },
+  {
+    id: 18,
+    imgAr: "https://k.top4top.io/p_3836mu3l41.png",
+    imgEn: "https://l.top4top.io/p_383695yn12.png"
+  },
+  {
+    id: 19,
+    imgAr: "https://a.top4top.io/p_3836hudnp3.png",
+    imgEn: "https://b.top4top.io/p_3836v78fy4.png"
+  },
+  {
+    id: 20,
+    imgAr: "https://c.top4top.io/p_3836mkjlm5.png",
+    imgEn: "https://d.top4top.io/p_3836ml4ln6.png"
+  },
+  {
+    id: 21,
+    imgAr: "https://e.top4top.io/p_3836ev3vg7.png",
+    imgEn: "https://f.top4top.io/p_3836qzztd8.png"
+  },
+  {
+    id: 22,
+    imgAr: "https://g.top4top.io/p_38369xj6e9.png",
+    imgEn: "https://h.top4top.io/p_3836jgsil10.png"
+  },
+  {
+    id: 23,
+    imgAr: "https://d.top4top.io/p_3836fczns1.png",
+    imgEn: "https://e.top4top.io/p_3836mwmr72.png"
+  },
+  {
+    id: 24,
+    imgAr: "https://f.top4top.io/p_383688gxj3.png",
+    imgEn: "https://g.top4top.io/p_38366f7ie4.png"
+  },
+  {
+    id: 25,
+    imgAr: "https://h.top4top.io/p_3836osqjl5.png",
+    imgEn: "https://i.top4top.io/p_38369nvxf6.png"
+  },
+  {
+    id: 26,
+    imgAr: "https://j.top4top.io/p_3836ozalf7.png",
+    imgEn: "https://k.top4top.io/p_383652wir8.png"
+  },
+  {
+    id: 27,
+    imgAr: "https://l.top4top.io/p_383639v039.png",
+    imgEn: "https://l.top4top.io/p_3836cj9ng1.png"
+  },
+  {
+    id: 28,
+    imgAr: "https://c.top4top.io/p_3836izcbm1.png",
+    imgEn: "https://d.top4top.io/p_3836e6d8j2.png"
+  },
+  {
+    id: 29,
+    imgAr: "https://e.top4top.io/p_3836il7gt3.png",
+    imgEn: "https://f.top4top.io/p_3836dk1xk4.png"
+  },
+  {
+    id: 30,
+    imgAr: "https://g.top4top.io/p_38363az785.png",
+    imgEn: "https://h.top4top.io/p_3836e6wmn6.png"
+  },
+  {
+    id: 31,
+    imgAr: "https://i.top4top.io/p_3836jhxba7.png",
+    imgEn: "https://j.top4top.io/p_38360f5t78.png"
+  },
+  {
+    id: 32,
+    imgAr: "https://j.top4top.io/p_3836z7ag21.png",
+    imgEn: "https://k.top4top.io/p_3836bk0g52.png"
+  },
+  {
+    id: 33,
+    imgAr: "https://l.top4top.io/p_3836z1xwr3.png",
+    imgEn: "https://a.top4top.io/p_3836sl49u4.png"
+  },
+  {
+    id: 34,
+    imgAr: "https://b.top4top.io/p_3836k9ddt5.png",
+    imgEn: "https://c.top4top.io/p_3836vu22z6.png"
+  },
+  {
+    id: 35,
+    imgAr: "https://d.top4top.io/p_38363si2t7.png",
+    imgEn: "https://e.top4top.io/p_3836qi7zo8.png"
+  },
+  {
+    id: 36,
+    imgAr: "https://f.top4top.io/p_3836ug9li1.png",
+    imgEn: "https://g.top4top.io/p_3836g7eg12.png"
+  },
+  {
+    id: 37,
+    imgAr: "https://h.top4top.io/p_3836lqorl3.png",
+    imgEn: "https://i.top4top.io/p_3836lrfy74.png"
+  },
+  {
+    id: 38,
+    imgAr: "https://j.top4top.io/p_3836x5vhg5.png",
+    imgEn: "https://k.top4top.io/p_3836vu56g6.png"
+  },
+  {
+    id: 39,
+    imgAr: "https://l.top4top.io/p_3836tqmg57.png",
+    imgEn: "https://a.top4top.io/p_3836w8fao8.png"
+  },
+  {
+    id: 40,
+    imgAr: "https://b.top4top.io/p_3836pcw729.png",
+    imgEn: "https://c.top4top.io/p_3836kjzke10.png"
+  },
+  {
+    id: 41,
+    imgAr: "https://h.top4top.io/p_38360rzsb1.png",
+    imgEn: "https://i.top4top.io/p_38365rhru2.png"
+  },
+  {
+    id: 42,
+    imgAr: "https://j.top4top.io/p_3836b7hl63.png",
+    imgEn: "https://k.top4top.io/p_3836vuj504.png"
+  },
+  {
+    id: 43,
+    imgAr: "https://l.top4top.io/p_3836vauu35.png",
+    imgEn: "https://a.top4top.io/p_3836wdy2r6.png"
+  },
+  {
+    id: 44,
+    imgAr: "https://b.top4top.io/p_3836s2nnu7.png",
+    imgEn: "https://c.top4top.io/p_3836t78yk8.png"
+  },
+  {
+    id: 45,
+    imgAr: "https://d.top4top.io/p_3836vz5149.png",
+    imgEn: "https://e.top4top.io/p_38367wppg10.png"
+  },
+  {
+    id: 46,
+    imgAr: "https://l.top4top.io/p_38368h3d21.png",
+    imgEn: "https://a.top4top.io/p_3836s4wjk2.png"
+  },
+  {
+    id: 47,
+    imgAr: "https://b.top4top.io/p_3836m16xg3.png",
+    imgEn: "https://c.top4top.io/p_38363bocy4.png"
+  },
+  {
+    id: 48,
+    imgAr: "https://d.top4top.io/p_3836n8v9c5.png",
+    imgEn: "https://e.top4top.io/p_3836sqhlz6.png"
+  },
+  {
+    id: 49,
+    imgAr: "https://f.top4top.io/p_3836gvgnj1.png",
+    imgEn: "https://g.top4top.io/p_3836tq6y42.png"
+  },
+  {
+    id: 50,
+    imgAr: "https://h.top4top.io/p_3836urw7s3.png",
+    imgEn: "https://i.top4top.io/p_38367t7qu4.png"
+  },
+  {
+    id: 51,
+    imgAr: "https://j.top4top.io/p_38366nwmu5.png",
+    imgEn: "https://k.top4top.io/p_3836l8l9d6.png"
+  },
+  {
+    id: 52,
+    imgAr: "https://l.top4top.io/p_3836gcy807.png",
+    imgEn: "https://a.top4top.io/p_383648r5r8.png"
+  },
+  {
+    id: 53,
+    imgAr: "https://h.top4top.io/p_38361vl611.png",
+    imgEn: "https://i.top4top.io/p_3836emjew2.png"
   }
 ];
 
@@ -196,6 +292,21 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
   const startX = useRef(0);
   const scrollLeftStart = useRef(0);
   const initialized = useRef(false);
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Reset initialization flag when language changes so that the slider can re-center with the new images
+  useEffect(() => {
+    initialized.current = false;
+  }, [lang]);
+
+  // Clean up any pending timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Triple-duplicate the array for perfectly seamless infinite scroll
   const items = [...SUPPLEMENTS, ...SUPPLEMENTS, ...SUPPLEMENTS];
@@ -285,6 +396,16 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
 
   const scrollByAmount = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
+
+    // Temporarily pause automatic scrolling to let the smooth manual scroll complete cleanly
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 2500); // Resume auto-scrolling after 2.5 seconds of user inactivity
+
     const scrollAmount = 320; // single card width + gap
     const target = scrollRef.current.scrollLeft + (direction === "left" ? -scrollAmount : scrollAmount);
     
@@ -308,9 +429,9 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
         </div>
         
         {/* Navigation Info */}
-        <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400 font-mono mt-4 sm:mt-0">
-          <span>{isRtl ? "اسحب للتمرير أو استخدم الأسهم" : "Drag to scroll or use arrows"}</span>
-          <div className="flex gap-1.5 ml-2">
+        <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono mt-4 sm:mt-0">
+          <span className="hidden sm:inline">{isRtl ? "اسحب للتمرير أو استخدم الأسهم" : "Drag to scroll or use arrows"}</span>
+          <div className="flex gap-1.5 ml-2" dir="ltr">
             <button
               onClick={() => scrollByAmount("left")}
               className={`p-1.5 rounded-full border transition-all ${
@@ -337,23 +458,6 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
 
       {/* Main Slider Container with touch indicators */}
       <div className="relative">
-        {/* Left Arrow Button Overlay */}
-        <button
-          onClick={() => scrollByAmount("left")}
-          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-[#e4562f] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 opacity-0 group-hover/slider:opacity-100 duration-300"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        {/* Right Arrow Button Overlay */}
-        <button
-          onClick={() => scrollByAmount("right")}
-          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-[#e4562f] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 opacity-0 group-hover/slider:opacity-100 duration-300"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
 
         {/* Scroll Row */}
         <div
@@ -372,66 +476,24 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
           onScroll={handleScrollCheck}
           className="flex gap-6 overflow-x-hidden py-4 select-none cursor-grab active:cursor-grabbing scroll-smooth"
           style={{ WebkitOverflowScrolling: "touch" }}
+          dir="ltr"
         >
           {items.map((supp, index) => {
-            const name = isRtl ? supp.nameAr : supp.nameEn;
-            const tag = isRtl ? supp.tagAr : supp.tagEn;
-            const desc = isRtl ? supp.descAr : supp.descEn;
+            const imgSrc = isRtl ? supp.imgAr : supp.imgEn;
 
             return (
               <div
                 key={`${supp.id}-${index}`}
                 onClick={onSelectSupplement}
-                className={`w-[280px] sm:w-[310px] shrink-0 rounded-2xl p-5 border transition-all duration-300 ${
-                  theme === "dark"
-                    ? "bg-zinc-900/40 border-zinc-800/80 hover:border-[#e4562f]/50 hover:bg-zinc-900/90 hover:shadow-xl hover:shadow-[#e4562f]/5"
-                    : "bg-white border-zinc-100 hover:border-[#e4562f]/40 hover:bg-zinc-50/80 hover:shadow-xl hover:shadow-zinc-200/50"
-                } group/card`}
+                className="w-[280px] sm:w-[320px] aspect-[3/4] sm:aspect-[4/5] shrink-0 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#e4562f]/15 cursor-pointer bg-black/10 dark:bg-black/40 flex items-center justify-center p-1"
               >
-                {/* Product Image */}
-                <div className="relative aspect-square rounded-xl overflow-hidden mb-4 bg-zinc-950">
-                  <img
-                    src={supp.img}
-                    alt={name}
-                    className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                    draggable={false}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-                  
-                  {/* Rating Tag */}
-                  <div className="absolute top-2.5 right-2.5 bg-zinc-900/85 backdrop-blur-xs px-2 py-1 rounded-md border border-zinc-800 flex items-center gap-1">
-                    <Star className="w-3 h-3 text-amber-400 fill-current" />
-                    <span className="text-[11px] font-bold text-white">{supp.rating}</span>
-                  </div>
-
-                  {/* Category Tag */}
-                  <div className="absolute bottom-2.5 left-2.5 bg-[#e4562f] text-white text-[10px] tracking-wider font-extrabold uppercase px-2.5 py-1 rounded-sm">
-                    {tag}
-                  </div>
-                </div>
-
-                {/* Info block */}
-                <div className="space-y-2">
-                  <h4 className={`text-base sm:text-lg font-extrabold tracking-tight ${
-                    theme === "dark" ? "text-white group-hover/card:text-[#e4562f]" : "text-zinc-950 group-hover/card:text-[#e4562f]"
-                  } transition-colors`}>
-                    {name}
-                  </h4>
-                  <p className={`text-xs sm:text-sm leading-relaxed line-clamp-2 h-10 ${
-                    theme === "dark" ? "text-zinc-400" : "text-zinc-600"
-                  }`}>
-                    {desc}
-                  </p>
-                  
-                  {/* Card CTA */}
-                  <div className="pt-3 border-t border-zinc-800/20 flex items-center justify-between text-xs font-extrabold tracking-wider">
-                    <span className="text-[#e4562f] uppercase group-hover/card:translate-x-1 transition-transform">
-                      {isRtl ? "اطلب برنامج المكملات ←" : "GET PROTOCOL →"}
-                    </span>
-                    <span className="text-zinc-500 font-mono">DAHAB FIT</span>
-                  </div>
-                </div>
+                <img
+                  src={imgSrc}
+                  alt="Supplement Product"
+                  className="w-full h-full object-contain rounded-xl"
+                  referrerPolicy="no-referrer"
+                  draggable={false}
+                />
               </div>
             );
           })}

@@ -65,7 +65,7 @@ export default function RegistrationModal({
       img.src = objectUrl;
       img.onload = () => {
         URL.revokeObjectURL(objectUrl);
-        const maxDim = 1200; // Sharp but lightweight
+        const maxDim = 600; // Sharp but lightweight
         let width = img.width;
         let height = img.height;
 
@@ -85,7 +85,7 @@ export default function RegistrationModal({
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.7); // 70% quality compression
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.5); // 50% quality compression
           resolve({ name: file.name, data: dataUrl });
         } else {
           const reader = new FileReader();
@@ -194,62 +194,25 @@ export default function RegistrationModal({
         uploadedFiles: base64Files,
       };
 
-      // 1. Instantly save to local browser storage as a robust copy so it is never lost in Vercel
-      const localId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      // Submit to backend API
       try {
-        const localSubmissions = JSON.parse(localStorage.getItem("local_submissions") || "[]");
-        const newLocalSubmission = {
-          id: localId,
-          createdAt: new Date().toISOString(),
-          name: formData.name,
-          email: formData.email,
-          weight: formData.weight,
-          height: formData.height,
-          age: formData.age,
-          goal: formData.goal,
-          notes: formData.notes,
-          programId: activeProgram?.id || "custom-elite",
-          programTitleEn: activeProgram?.titleEn || "Custom Elite Program",
-          programTitleAr: activeProgram?.titleAr || "برنامج النخبة المخصص",
-          paymentMethod,
-          paymentProofUrl: base64Proof ? base64Proof.data : null,
-          photos: base64Files.map(f => ({ name: f.name, url: f.data })),
-          status: "pending",
-        };
-        localSubmissions.push(newLocalSubmission);
-        localStorage.setItem("local_submissions", JSON.stringify(localSubmissions));
-      } catch (err) {
-        console.warn("Failed to write to localStorage backup", err);
-      }
-
-      // 2. Submit to backend API
-      let apiSuccess = false;
-      try {
-        const response = await fetch("/api/submit-registration", {
+        await fetch("/api/submit-registration", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
         });
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log("Submission API result:", result);
-          apiSuccess = true;
-        } else {
-          console.warn("Server API returned error response code:", response.status);
-        }
       } catch (apiErr) {
-        console.warn("Network submission to server API failed:", apiErr);
+        console.warn("Backend API submission failed:", apiErr);
       }
 
-      // Transition to success screen because data is securely stored in localStorage anyway
+      // Transition to success screen
       setIsSubmitted(true);
       if (showToast) {
         const msg = isRtl
-          ? `شكرًا لك يا ${formData.name}! تم تأكيد اشتراكك وحفظ بياناتك بنجاح.`
-          : `Thank you, ${formData.name}! Your subscription and details have been registered successfully.`;
+          ? `شكرًا لك يا ${formData.name}! تم تأكيد اشتراكك بنجاح.`
+          : `Thank you, ${formData.name}! Your subscription details have been submitted successfully.`;
         showToast(msg, "success");
       }
     } catch (err: any) {

@@ -38,7 +38,6 @@ import ConsultationModal from "./components/ConsultationModal";
 import RecipeBookModal from "./components/RecipeBookModal";
 import WhoIsDurrahModal from "./components/WhoIsDurrahModal";
 import ToastContainer, { ToastMessage } from "./components/Toast";
-import AdminSubmissionsModal from "./components/AdminSubmissionsModal";
 import SupplementSlider from "./components/SupplementSlider";
 
 // Image asset imports
@@ -99,7 +98,6 @@ export default function App() {
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const [isRecipeOpen, setIsRecipeOpen] = useState(false);
   const [isWhoDurrahOpen, setIsWhoDurrahOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   // Toast notification state
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -929,13 +927,6 @@ export default function App() {
         }`}>
           <p className="flex items-center justify-center gap-2">
             <span>© {new Date().getFullYear()} {dict.brandName}. ALL RIGHTS RESERVED. POWERED BY DAHAB FIT.</span>
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              className="p-1 rounded text-zinc-600 hover:text-[#e4562f] hover:bg-zinc-800/20 transition-all cursor-pointer"
-              title="Admin Panel"
-            >
-              ⚙️
-            </button>
           </p>
         </div>
       </footer>
@@ -990,12 +981,6 @@ export default function App() {
         isOpen={isWhoDurrahOpen}
         onClose={() => setIsWhoDurrahOpen(false)}
         dictionary={dict}
-        isRtl={isRtl}
-      />
-
-      <AdminSubmissionsModal
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
         isRtl={isRtl}
       />
 
