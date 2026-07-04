@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import cyi5YVR from "../assets/images/CYi5YVR.png";
-import cyi5WDG from "../assets/images/CYi5WDG.png";
 
 interface SupplementItem {
   id: number;
@@ -87,8 +85,8 @@ const SUPPLEMENTS: SupplementItem[] = [
   },
   {
     id: 16,
-    imgAr: cyi5YVR,
-    imgEn: cyi5WDG
+    imgAr: "https://iili.io/CYi5YVR.png",
+    imgEn: "https://iili.io/CYi5WDG.png"
   },
   {
     id: 17,
@@ -269,18 +267,13 @@ const SUPPLEMENTS: SupplementItem[] = [
     id: 52,
     imgAr: "https://l.top4top.io/p_3836gcy807.png",
     imgEn: "https://a.top4top.io/p_383648r5r8.png"
-  },
-  {
-    id: 53,
-    imgAr: "https://h.top4top.io/p_38361vl611.png",
-    imgEn: "https://i.top4top.io/p_3836emjew2.png"
   }
 ];
 
 interface SupplementSliderProps {
   lang: "en" | "ar";
   theme: "dark" | "light";
-  onSelectSupplement: () => void;
+  onSelectSupplement: (id: number) => void;
 }
 
 export default function SupplementSlider({ lang, theme, onSelectSupplement }: SupplementSliderProps) {
@@ -484,7 +477,7 @@ export default function SupplementSlider({ lang, theme, onSelectSupplement }: Su
             return (
               <div
                 key={`${supp.id}-${index}`}
-                onClick={onSelectSupplement}
+                onClick={() => onSelectSupplement(supp.id)}
                 className="w-[280px] sm:w-[320px] aspect-[3/4] sm:aspect-[4/5] shrink-0 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#e4562f]/15 cursor-pointer bg-black/10 dark:bg-black/40 flex items-center justify-center p-1"
               >
                 <img

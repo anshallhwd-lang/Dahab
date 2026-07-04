@@ -39,6 +39,7 @@ import RecipeBookModal from "./components/RecipeBookModal";
 import WhoIsDurrahModal from "./components/WhoIsDurrahModal";
 import ToastContainer, { ToastMessage } from "./components/Toast";
 import SupplementSlider from "./components/SupplementSlider";
+import GoldStandardLandingPage from "./components/GoldStandardLandingPage";
 
 // Image asset imports
 import durrahHero from "./assets/images/durrah_hero_1782919258240.jpg";
@@ -58,7 +59,13 @@ const imageMap: Record<string, string> = {
 };
 
 export default function App() {
-  const [lang, setLang] = useState<"en" | "ar">("en");
+  const [lang, setLang] = useState<"en" | "ar">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("lang");
+      if (saved === "en" || saved === "ar") return saved;
+    }
+    return "en";
+  });
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("theme");
@@ -73,6 +80,14 @@ export default function App() {
     }
     return "USA";
   });
+
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+    if (typeof window !== "undefined") {
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.documentElement.lang = lang;
+    }
+  }, [lang]);
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
@@ -101,6 +116,7 @@ export default function App() {
 
   // Toast notification state
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [detailedProductId, setDetailedProductId] = useState<number | null>(null);
 
   const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -136,9 +152,19 @@ export default function App() {
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (detailedProductId !== null) {
+      setDetailedProductId(null);
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -173,7 +199,7 @@ export default function App() {
       {/* HEADER / NAVIGATION BAR */}
       <header
         id="navbar-header"
-        className={`sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b transition-all duration-300 ${
           theme === "dark" ? "bg-zinc-950/90 border-zinc-900" : "bg-white/90 border-zinc-200"
         }`}
       >
@@ -414,10 +440,34 @@ export default function App() {
         )}
       </header>
 
-      {/* HERO SECTION */}
+      {detailedProductId !== null ? (
+        <GoldStandardLandingPage
+          lang={lang}
+          theme={theme}
+          country={country}
+          initialSize={detailedProductId === 5 ? "898g" : "2290g"}
+          onBack={() => setDetailedProductId(null)}
+          onToggleLanguage={toggleLanguage}
+          onToggleTheme={toggleTheme}
+          onAddToCart={(name, price) => {
+            const displayPrice = country === "USA" 
+              ? `${(price / 55).toFixed(2)} USDT` 
+              : `${price.toLocaleString()} ${lang === "ar" ? "ج.م" : "EGP"}`;
+            showToast(
+              lang === "ar"
+                ? `تم إضافة ${name} بقيمة ${displayPrice} بنجاح!`
+                : `Added ${name} for ${displayPrice} successfully!`,
+              "success"
+            );
+          }}
+          hideHeader={true}
+        />
+      ) : (
+        <>
+          {/* HERO SECTION */}
       <section
         id="hero-section"
-        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-950 border-b border-zinc-900"
+        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-950 border-b border-zinc-900 pt-20"
       >
         {/* Background Image with Dark Overlays */}
         <div className="absolute inset-0 z-0">
@@ -585,7 +635,12 @@ export default function App() {
             <SupplementSlider
               lang={lang}
               theme={theme}
-              onSelectSupplement={() => setIsRegModalOpen(true)}
+              onSelectSupplement={(id) => {
+                if (id === 53 || id === 2 || id === 5) {
+                  setDetailedProductId(id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
             />
           </div>
         </div>
@@ -930,6 +985,7 @@ export default function App() {
           </p>
         </div>
       </footer>
+      </>)}
 
       {/* FLOAT SCROLL TO TOP BUTTON */}
       {showScrollTop && (
