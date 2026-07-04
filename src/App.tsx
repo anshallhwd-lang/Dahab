@@ -888,7 +888,7 @@ export default function App() {
               }`}>{dict.followDurrah}</h4>
               <div className="flex gap-4">
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/profile.php?id=61591175177059"
                   target="_blank"
                   referrerPolicy="no-referrer"
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
@@ -900,7 +900,7 @@ export default function App() {
                   <Facebook className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/dahab_fit/"
                   target="_blank"
                   referrerPolicy="no-referrer"
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
@@ -912,7 +912,7 @@ export default function App() {
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://youtube.com"
+                  href="https://www.youtube.com/@dahab_fit"
                   target="_blank"
                   referrerPolicy="no-referrer"
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
@@ -922,6 +922,20 @@ export default function App() {
                   }`}
                 >
                   <Youtube className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@dahab_fit"
+                  target="_blank"
+                  referrerPolicy="no-referrer"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    theme === "dark"
+                      ? "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#e4562f] hover:border-[#e4562f]/50"
+                      : "bg-white border border-zinc-200 text-zinc-600 hover:text-[#e4562f] hover:border-[#e4562f]/50 shadow-sm"
+                  }`}
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.18 2.29 1.98 3.75 2.27V10.3c-1.21-.01-2.4-.33-3.46-1-.87-.56-1.58-1.34-2.11-2.25v7.02c0 .76-.08 1.52-.25 2.26-.51 2.24-2.15 4.14-4.32 4.96-1.72.65-3.66.62-5.36-.1-2.09-.88-3.66-2.82-4.14-5.04C.94 15.01 1.71 12.44 3.5 10.74c1.69-1.61 4.1-2.32 6.36-1.89v3.86c-.95-.27-1.99-.17-2.86.3-.92.51-1.57 1.45-1.73 2.5-.24 1.54.49 3.09 1.8 3.82 1.18.66 2.67.62 3.8-.1 1.05-.68 1.66-1.86 1.66-3.11V0h-.01z"/>
+                  </svg>
                 </a>
               </div>
             </div>
