@@ -173,14 +173,34 @@ export default function ProductPurchaseModal({
         submittedAt: new Date().toISOString(),
       };
 
-      // Submit to Backend API
-      await fetch("/api/submit-purchase", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      // Submit to Backend API (wrapped in try-catch to prevent crash on Vercel/Static hosting)
+      try {
+        await fetch("/api/submit-purchase", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch (apiErr) {
+        console.warn("Backend API submission failed (expected if on Vercel/Static hosting):", apiErr);
+      }
+
+      // Direct client-side submission to Google Sheets Webhook (essential for Vercel/GitHub Pages static hosting)
+      try {
+        const supplementWebhookUrl = "https://script.google.com/macros/s/AKfycbysS52BPYIMwUesRjRz5LesEWWrSg3h9HjNMHrj7L0M4cyJNVIhcvmSyo39NxeRNJJN/exec";
+        await fetch(supplementWebhookUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          body: JSON.stringify({ ...payload, dataType: "supplement_purchase" }),
+        });
+        console.log("Direct client-side supplement purchase successfully forwarded to Google Sheets!");
+      } catch (clientErr) {
+        console.error("Direct client-side supplement purchase forwarding failed:", clientErr);
+      }
 
       setIsSubmitted(true);
       if (showToast) {

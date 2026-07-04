@@ -207,6 +207,22 @@ export default function RegistrationModal({
         console.warn("Backend API submission failed:", apiErr);
       }
 
+      // Direct client-side submission to Google Sheets Webhook (essential for Vercel/GitHub Pages static hosting)
+      try {
+        const courseWebhookUrl = "https://script.google.com/macros/s/AKfycbxJi-2-7noOBRO1HDlUwL8CrTuD15kKVYBicB4ky9KCledfJNa6eSyvey6MTZ9EEUhA/exec";
+        await fetch(courseWebhookUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          body: JSON.stringify({ ...payload, dataType: "course_registration" }),
+        });
+        console.log("Direct client-side course registration successfully forwarded to Google Sheets!");
+      } catch (clientErr) {
+        console.error("Direct client-side course registration forwarding failed:", clientErr);
+      }
+
       // Transition to success screen
       setIsSubmitted(true);
       if (showToast) {
